@@ -59,6 +59,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public IEnumerable<string> UploadedList { get; set; }
 
         /// <summary>
+        /// Gets or sets a upload list name.
+        /// </summary>
+        public string UploadedListName { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether a notification was sent to all users.
         /// </summary>
         public bool AllUsers { get; set; }

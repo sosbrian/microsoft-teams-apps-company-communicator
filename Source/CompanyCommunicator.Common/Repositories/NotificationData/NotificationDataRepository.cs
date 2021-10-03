@@ -112,6 +112,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Groups = draftNotificationEntity.Groups,
                     AllUsers = draftNotificationEntity.AllUsers,
                     UploadedList = draftNotificationEntity.UploadedList,
+                    UploadedListName = draftNotificationEntity.UploadedListName,
                     ExclusionList = draftNotificationEntity.ExclusionList,
                     MessageVersion = draftNotificationEntity.MessageVersion,
                     Succeeded = 0,
@@ -187,6 +188,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     Groups = notificationEntity.Groups,
                     Rosters = notificationEntity.Rosters,
                     UploadedList = notificationEntity.UploadedList,
+                    UploadedListName = notificationEntity.UploadedListName,
                     ExclusionList = notificationEntity.ExclusionList,
                     AllUsers = notificationEntity.AllUsers,
                 };

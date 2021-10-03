@@ -38,6 +38,16 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public IEnumerable<string> UploadedList { get; set; }
 
         /// <summary>
+        /// Gets or sets Uploaded List name.
+        /// </summary>
+        public string UploadedListName { get; set; }
+
+        /// <summary>
+        /// Gets or sets Exclusion List value.
+        /// </summary>
+        public string ExclusionList { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the All Users option is selected.
         /// </summary>
         public bool AllUsers { get; set; }

@@ -47,6 +47,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// </summary>
         public IEnumerable<string> UploadedList { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets Uploaded list audience id collection.
+        /// </summary>
+        public string UploadedListName { get; set; }
+
         /// <summary>
         /// Gets or sets exclusion list audience id collection.
         /// </summary>

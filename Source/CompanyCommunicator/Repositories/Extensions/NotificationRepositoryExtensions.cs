@@ -71,6 +71,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Repositories.Extensions
                 Rosters = notification.Rosters,
                 Groups = notification.Groups,
                 UploadedList = notification.UploadedList,
+                UploadedListName = notification.UploadedListName,
                 ExclusionList = notification.ExclusionList,
                 AllUsers = notification.AllUsers,
             };

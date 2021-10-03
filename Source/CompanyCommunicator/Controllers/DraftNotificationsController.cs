@@ -184,6 +184,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Rosters = notification.Rosters,
                 Groups = notification.Groups,
                 UploadedList = notification.UploadedList,
+                UploadedListName = notification.UploadedListName,
                 ExclusionList = notification.ExclusionList,
                 AllUsers = notification.AllUsers,
             };
@@ -302,6 +303,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Rosters = notificationEntity.Rosters,
                 Groups = notificationEntity.Groups,
                 UploadedList = notificationEntity.UploadedList,
+                UploadedListName = notificationEntity.UploadedListName,
                 ExclusionList = notificationEntity.ExclusionList,
                 AllUsers = notificationEntity.AllUsers,
             };
@@ -344,6 +346,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 GroupNames = groupNames,
                 AllUsers = notificationEntity.AllUsers,
                 UploadedList = notificationEntity.UploadedList,
+                UploadedListName = notificationEntity.UploadedListName,
+                ExclusionList = notificationEntity.ExclusionList,
             };
 
             return this.Ok(result);

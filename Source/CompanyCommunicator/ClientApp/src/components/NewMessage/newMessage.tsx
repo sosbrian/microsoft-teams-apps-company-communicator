@@ -27,6 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Switch, FormLabel, FormControl, FormGroup, FormControlLabel, FormHelperText, Grid } from '@material-ui/core';
 //import Button as Button1 } from '@mui/material/Button';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
+import Paper from '@material-ui/lab';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FontDownloadIcon from '@material-ui/icons/FontDownload';
 import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
@@ -34,7 +35,7 @@ import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter';
 import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 import { CSVReader } from 'react-papaparse';
 import UploadIcon from '@mui/icons-material/Upload';
-import { withStyles } from '@material-ui/core/styles';
+import { styled } from '@material-ui/core/styles';
 import { forEachChild } from 'typescript';
 
 
@@ -1263,6 +1264,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 selectedRosters: draftMessageDetail.rosters,
                 selectedGroups: draftMessageDetail.groups,
                 uploadedList: draftMessageDetail.uploadedList,
+                uploadedListName: draftMessageDetail.uploadedListName,
                 exclusionList: draftMessageDetail.exclusionList
             });
 
@@ -1342,6 +1344,21 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     }
 
     public render(): JSX.Element {
+        const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+            '& .MuiToggleButtonGroup-grouped': {
+                margin: theme.spacing(0.5),
+                border: 0,
+                '&.Mui-disabled': {
+                    border: 0,
+                },
+                '&:not(:first-of-type)': {
+                    borderRadius: theme.shape.borderRadius,
+                },
+                '&:first-of-type': {
+                    borderRadius: theme.shape.borderRadius,
+                },
+            },
+        }));
         const isUploadedList = this.state.selectedFileName;
         let uploadList: {} | null | undefined;
         if (isUploadedList) {
@@ -2446,27 +2463,11 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                             return (
                                                                 <Flex key={name} column>
                                                                     <Component {...props} />
-                                                                    {/*<div className={this.state.groupsOptionSelected && !this.state.groupAccess ? "" : "hide"}>*/}
-                                                                    {/*    <div className="noteText">*/}
-                                                                    {/*        <Text error content={this.localize("SendToGroupsPermissionNote")} />*/}
-                                                                    {/*    </div>*/}
-                                                                    {/*</div>*/}
-                                                                    {/*<Dropdown*/}
-                                                                    {/*    className="hideToggle"*/}
-                                                                    {/*    hidden={!this.state.groupsOptionSelected || !this.state.groupAccess}*/}
-                                                                    {/*    placeholder={this.localize("SendToGroupsPlaceHolder")}*/}
-                                                                    {/*    search={this.onGroupSearch}*/}
-                                                                    {/*    multiple*/}
-                                                                    {/*    loading={this.state.loading}*/}
-                                                                    {/*    loadingMessage={this.localize("LoadingText")}*/}
-                                                                    {/*    items={this.getGroupItems()}*/}
-                                                                    {/*    value={this.state.selectedGroups}*/}
-                                                                    {/*    onSearchQueryChange={this.onGroupSearchQueryChange}*/}
-                                                                    {/*    onChange={this.onGroupsChange}*/}
-                                                                    {/*    noResultsMessage={this.state.noResultMessage}*/}
-                                                                    {/*    unstable_pinned={this.state.unstablePinned}*/}
-                                                                    {/*/>*/}
-
+                                                                    <div
+                                                                        hidden={!this.state.uploadedListName}
+                                                                    >
+                                                                        Filename: {this.state.uploadedListName}
+                                                                    </div>
                                                                     <Flex
                                                                         hidden={!this.state.uploadOptionSelected}
                                                                     >
@@ -2478,26 +2479,10 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                                             removeButtonColor='#659cef'
                                                                             onRemoveFile={this.handleOnRemoveFile}
                                                                         >
-                                                                            <span>Drop CSV file here or click to upload.</span>
+                                                                            <span>{this.renderFileName()}</span>
+                                                                            {/*<span>Drop CSV file here or click to upload.</span>*/}
                                                                         </CSVReader>
                                                                     </Flex>
-
-                                                                    {/*<input className="inputfile"*/}
-                                                                    {/*    style={{ display: "none" }}*/}
-                                                                    {/*    type="file"*/}
-                                                                    {/*    id="myUpload"*/}
-                                                                    {/*    onChange={this.handleSelectedFile}*/}
-                                                                    {/*    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"*/}
-                                                                    {/*/>*/}
-                                                                    {/*<Flex>*/}
-                                                                    {/*    <label hidden={!this.state.uploadOptionSelected} htmlFor="myUpload" style={{ width: "100%", margin: "5px" }}>{uploadList}</label>*/}
-                                                                    {/*    <label hidden={!this.state.uploadOptionSelected} htmlFor="myUpload" style={{ margin: "5px" }}><FontAwesomeIcon icon={faUpload} size="lg" /></label>*/}
-                                                                    {/*</Flex>*/}
-                                                                    {/*<div className={this.state.groupsOptionSelected && this.state.groupAccess ? "" : "hide"}>*/}
-                                                                    {/*    <div className="noteText">*/}
-                                                                    {/*        <Text error content={this.localize("SendToGroupsNote")} />*/}
-                                                                    {/*    </div>*/}
-                                                                    {/*</div>*/}
                                                                 </Flex>
                                                             )
                                                         },
@@ -2518,19 +2503,22 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                             <Input className="inputField"
                                                 fluid
                                                 value={this.state.exclusionList}
-                                                label="Exclusion List"
+                                                label="Exclusion List (Use ; to separate email)"
                                                 placeholder="Type in Email to exclude from this message"
                                                 onChange={this.onExclusionListChanged}
                                                 autoComplete="off"
                                             />
-                                            <FormControlLabel
-                                                control={
-                                                    <Switch
-                                                        color="primary"
-                                                    />
-                                                }
-                                                label="Send email to members"
-                                            />
+                                            {/*<div style={{ paddingLeft: '5px' }}>*/}
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            disabled
+                                                            color="primary"
+                                                        />
+                                                    }
+                                                    label="Send email to members"
+                                                />
+                                            {/*</div>*/}
                                             
                                         </Flex>
                                         
@@ -2545,7 +2533,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                         <Flex.Item push>
                                             <Button content={this.localize("Back")} onClick={this.onBack} secondary />
                                         </Flex.Item>
-                                        {/*<Button content="TEST" onClick={this.testConsole} secondary />*/}
                                         <Button content={this.localize("SaveAsDraft")} disabled={this.isSaveBtnDisabled()} id="saveBtn" onClick={this.onSave} primary />
                                     </Flex>
                                 </Flex>
@@ -2572,6 +2559,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedGroups: data.value === 'groups' ? this.state.selectedGroups : [],
             selectedGroupsNum: data.value === 'groups' ? this.state.selectedGroupsNum : 0,
             uploadedList: data.value === 'uploadList' ? this.state.uploadedList : [],
+            uploadedListName: data.value === 'uploadList' ? this.state.uploadedListName : "",
             resetCSVReader: data.value === 'uploadList' ? false : true
         });
     }
@@ -2635,7 +2623,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedRostersNum: 0,
             selectedGroups: [],
             selectedGroupsNum: 0,
-            uploadedList: []
+            uploadedList: [],
+            uploadedListName: "",
         })
     }
 
@@ -3478,6 +3467,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedGroups: [],
             selectedGroupsNum: 0,
             uploadedList: [],
+            uploadedListName: "",
             resetCSVReader: true
         })
     }
@@ -5084,6 +5074,18 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setState({
             exclusionList: event.target.value
         })
+    }
+
+    private renderFileName = () => {
+        if (this.state.uploadedListName) {
+            return (
+                this.state.uploadedListName
+                ); 
+        } else {
+            return (
+                "Drop CSV file here or click to upload."
+                );
+        }
     }
 
     private updateCard = () => {

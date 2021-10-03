@@ -31,7 +31,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     /// <summary>
     /// Controller for the sent notification data.
     /// </summary>
-    //[Authorize(PolicyNames.MustBeValidUpnPolicy)]
+    [Authorize(PolicyNames.MustBeValidUpnPolicy)]
     [Route("api/sentNotifications")]
     public class SentNotificationsController : ControllerBase
     {
@@ -250,6 +250,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 RosterNames = await this.teamDataRepository.GetTeamNamesByIdsAsync(notificationEntity.Rosters),
                 GroupNames = groupNames,
                 UploadedList = notificationEntity.UploadedList,
+                UploadedListName = notificationEntity.UploadedListName,
                 AllUsers = notificationEntity.AllUsers,
                 SendingStartedDate = notificationEntity.SendingStartedDate,
                 ErrorMessage = notificationEntity.ErrorMessage,

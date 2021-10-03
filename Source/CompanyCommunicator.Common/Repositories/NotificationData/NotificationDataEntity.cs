@@ -272,6 +272,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         }
 
         /// <summary>
+        /// Gets or sets the uploaded list name.
+        /// </summary>
+        public string UploadedListName { get; set; }
+
+        /// <summary>
         /// Gets or sets the exlusion list.
         /// </summary>
         public string ExclusionList { get; set; }

@@ -73,8 +73,10 @@ export interface IStatusState {
     rosterNames: string[];
     groupNames: string[];
     uploadedList: string[];
+    uploadedListName: string;
     allUsers: boolean;
     messageId: number;
+    exclusionList: string;
 }
 
 class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskModuleProps, IStatusState> {
@@ -99,7 +101,9 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
             groupNames: [],
             allUsers: false,
             uploadedList: [],
+            uploadedListName: "",
             messageId: 0,
+            exclusionList: ""
         };
     }
 
@@ -119,6 +123,8 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
                         groupNames: response.data.groupNames.sort(),
                         allUsers: response.data.allUsers,
                         uploadedList: response.data.uploadedList,
+                        uploadedListName: response.data.uploadedListName,
+                        exclusionList: response.data.exclusionList,
                         messageId: id,
                     }, () => {
                         this.setState({
@@ -214,6 +220,12 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
                                     <div className="results">
                                         {this.renderAudienceSelection()}
                                     </div>
+                                    <div className="results">
+                                        <div key="exclusionList" hidden={!this.state.exclusionList}>
+                                            <span className="label">Exclusion List</span>
+                                        </div>
+                                        {this.renderExclusionList()}
+                                    </div>
                                 </Flex>
                             </Flex.Item>
                             <Flex.Item size="size.half">
@@ -287,9 +299,23 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
             return (
                 <div key="uploadedList">
                     <span className="label">Custom Uploaded List</span>
+                    <div>{this.state.uploadedListName}</div>
                 </div>);
         } else {
             return (<div></div>);
+        }
+    }
+
+    private renderExclusionList = () => {
+        var exArray = this.state.exclusionList.split(';');
+        if (this.state.exclusionList) {
+            return (
+                exArray.map((item) => <div>{item}</div> )
+            );
+        } else {
+            return (
+                <div></div>
+            );
         }
     }
 }

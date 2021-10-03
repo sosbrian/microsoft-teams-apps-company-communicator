@@ -1,6 +1,10 @@
 .taskModule {
     width: fit-content;
 
+    .MuiFormControlLabel-root {
+        padding-left: 5px;
+    }
+
     .MuiTypography-body1 {
         font-size: 1.2rem !important;
         font-family: "Segoe UI", system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;

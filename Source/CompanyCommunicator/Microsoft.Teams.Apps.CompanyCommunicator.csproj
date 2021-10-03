@@ -34,6 +34,22 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ClientApp\src\components\NewMessage\a.json" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy %282%29.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy %282%29.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy %282%29.tsx" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy %282%29.tsx" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy.tsx" />
+    <None Remove="ClientApp\src\components\NewMessage\newMessage - Copy.tsx" />
+    <None Remove="ClientApp\src\components\NewMessage\teamTheme - Copy %282%29.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\teamTheme - Copy %282%29.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\teamTheme - Copy.scss" />
+    <None Remove="ClientApp\src\components\NewMessage\teamTheme - Copy.scss" />
+  </ItemGroup>
+
+  <ItemGroup>
     <AdditionalFiles Include="..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
 

@@ -27,7 +27,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Switch, FormLabel, FormControl, FormGroup, FormControlLabel, FormHelperText, Grid } from '@material-ui/core';
 //import Button as Button1 } from '@mui/material/Button';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-import Paper from '@material-ui/lab';
+//import Paper from '@material-ui/lab';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FontDownloadIcon from '@material-ui/icons/FontDownload';
 import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
@@ -1344,21 +1344,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     }
 
     public render(): JSX.Element {
-        const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-            '& .MuiToggleButtonGroup-grouped': {
-                margin: theme.spacing(0.5),
-                border: 0,
-                '&.Mui-disabled': {
-                    border: 0,
-                },
-                '&:not(:first-of-type)': {
-                    borderRadius: theme.shape.borderRadius,
-                },
-                '&:first-of-type': {
-                    borderRadius: theme.shape.borderRadius,
-                },
-            },
-        }));
         const isUploadedList = this.state.selectedFileName;
         let uploadList: {} | null | undefined;
         if (isUploadedList) {

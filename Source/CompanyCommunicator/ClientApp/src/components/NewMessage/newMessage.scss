@@ -9,7 +9,6 @@
         font-size: 1.2rem !important;
         font-family: "Segoe UI", system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
     }
-
     /*.inputfile {
         width: 0.1px;
         height: 0.1px;
@@ -131,10 +130,73 @@
                     }
                 }
 
-                .inputField2 {
-                    width: 90%;
+                .textArea {
 
-                    label {
+                    span {
+                        //font-size: 1.2rem;
+                        //display: block;
+                        //margin: 0.8rem 0rem 0.4rem 0rem;
+
+                        &:nth-child(2) {
+                            color: #C4314B;
+                        }
+                    }
+
+                    textarea {
+                        height: 9.6rem;
+                        padding: 0.6rem 1.2rem;
+                        font-size: 1.4rem;
+                        margin: auto 0;
+                    }
+
+                    i {
+                        bottom: 2.5rem;
+                    }
+                }
+
+                .hide {
+                    display: none;
+                }
+
+                .show {
+                    display: inline;
+                }
+
+                .radioBtns {
+                    width: 70%;
+
+                    p {
+                        margin: 1.5rem 0rem;
+                    }
+
+                    .ui-dropdown {
+                        margin: 0.6rem 0rem 0.6rem 2.5rem;
+                        //width: 30rem;
+                    }
+
+                    .noteText {
+                        margin: 1rem 0rem 1rem 2.5rem;
+                    }
+
+                    .hide {
+                        display: none;
+                    }
+
+                    .hideToggle {
+
+                        .ui-dropdown__toggle-indicator {
+                            visibility: hidden;
+                        }
+                    }
+
+                    .adaptiveCardContainer {
+                        margin: 0 2rem;
+                    }
+                }
+
+                .inputField2 {
+                    //width: 90%;
+                    /*label {
                         font-size: 1.2rem;
                         display: block;
                         margin: 0.8rem 0rem 0.4rem 0rem;
@@ -155,33 +217,6 @@
                     span {
                         display: inline-block;
                     }
-
-
-
-                    .textArea {
-
-                        span {
-                            font-size: 1.2rem;
-                            display: block;
-                            margin: 0.8rem 0rem 0.4rem 0rem;
-
-                            &:nth-child(2) {
-                                color: #C4314B;
-                            }
-                        }
-
-                        textarea {
-                            height: 9.6rem;
-                            padding: 0.6rem 1.2rem;
-                            font-size: 1.4rem;
-                            margin: auto 0;
-                        }
-
-                        i {
-                            bottom: 2.5rem;
-                        }
-                    }
-
                     .hide {
                         display: none;
                     }
@@ -217,10 +252,10 @@
                             }
                         }
                     }
-                }
 
-                .adaptiveCardContainer {
-                    margin: 0 2rem;
+                    .adaptiveCardContainer {
+                        margin: 0 2rem;
+                    }*/
                 }
             }
 
@@ -344,69 +379,70 @@
                     span {
                         display: inline-block;
                     }
+                }
 
 
 
-                    .textArea {
+                .textArea {
 
-                        span {
-                            font-size: 1.2rem;
-                            display: block;
-                            margin: 0.8rem 0rem 0.4rem 0rem;
+                    span {
+                        font-size: 1.2rem;
+                        display: block;
+                        margin: 0.8rem 0rem 0.4rem 0rem;
 
-                            &:nth-child(2) {
-                                color: #C4314B;
-                            }
+                        &:nth-child(2) {
+                            color: #C4314B;
                         }
+                    }
 
-                        textarea {
-                            height: 9.6rem;
-                            padding: 0.6rem 1.2rem;
-                            font-size: 1.4rem;
-                            margin: auto 0;
-                        }
+                    textarea {
+                        height: 9.6rem;
+                        padding: 0.6rem 1.2rem;
+                        font-size: 1.4rem;
+                        margin: auto 0;
+                    }
 
-                        i {
-                            bottom: 2.5rem;
-                        }
+                    i {
+                        bottom: 2.5rem;
+                    }
+                }
+
+                .hide {
+                    display: none;
+                }
+
+                .show {
+                    display: inline;
+                }
+
+                .radioBtns {
+                    width: 70%;
+
+                    p {
+                        margin: 1.5rem 0rem;
+                    }
+
+                    .ui-dropdown {
+                        margin: 0.6rem 0rem 0.6rem 2.5rem;
+                        width: 30rem;
+                    }
+
+                    .noteText {
+                        margin: 1rem 0rem 1rem 2.5rem;
                     }
 
                     .hide {
                         display: none;
                     }
 
-                    .show {
-                        display: inline;
-                    }
+                    .hideToggle {
 
-                    .radioBtns {
-                        width: 70%;
-
-                        p {
-                            margin: 1.5rem 0rem;
-                        }
-
-                        .ui-dropdown {
-                            margin: 0.6rem 0rem 0.6rem 2.5rem;
-                            width: 30rem;
-                        }
-
-                        .noteText {
-                            margin: 1rem 0rem 1rem 2.5rem;
-                        }
-
-                        .hide {
-                            display: none;
-                        }
-
-                        .hideToggle {
-
-                            .ui-dropdown__toggle-indicator {
-                                visibility: hidden;
-                            }
+                        .ui-dropdown__toggle-indicator {
+                            visibility: hidden;
                         }
                     }
                 }
+
 
                 .adaptiveCardContainer {
                     margin: 0 2rem;

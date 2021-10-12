@@ -5,7 +5,7 @@ import * as React from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { withTranslation, WithTranslation } from "react-i18next";
 import * as AdaptiveCards from "adaptivecards";
-import { Loader, Button, Text, List, Image, Flex } from '@fluentui/react-northstar';
+import { Loader, Button, Text, List, Image, Flex, Checkbox } from '@fluentui/react-northstar';
 import * as microsoftTeams from "@microsoft/teams-js";
 
 import './sendConfirmationTaskModule.scss';
@@ -16,6 +16,8 @@ import {
 } from '../AdaptiveCard/adaptiveCard';
 import { ImageUtil } from '../../utility/imageutility';
 import { TFunction } from "i18next";
+import { Switch, FormControlLabel } from '@material-ui/core';
+import { Check } from 'office-ui-fabric-react';
 
 export interface IListItem {
     header: string,
@@ -74,6 +76,7 @@ export interface IStatusState {
     groupNames: string[];
     uploadedList: string[];
     uploadedListName: string;
+    emailOption: boolean;
     allUsers: boolean;
     messageId: number;
     exclusionList: string;
@@ -102,6 +105,7 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
             allUsers: false,
             uploadedList: [],
             uploadedListName: "",
+            emailOption: false,
             messageId: 0,
             exclusionList: ""
         };
@@ -124,6 +128,7 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
                         allUsers: response.data.allUsers,
                         uploadedList: response.data.uploadedList,
                         uploadedListName: response.data.uploadedListName,
+                        emailOption: response.data.emailOption,
                         exclusionList: response.data.exclusionList,
                         messageId: id,
                     }, () => {
@@ -226,6 +231,9 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
                                         </div>
                                         {this.renderExclusionList()}
                                     </div>
+                                    <div className="results">
+                                        <Checkbox label="Send email to members" checked={this.state.emailOption} disabled />
+                                    </div>
                                 </Flex>
                             </Flex.Item>
                             <Flex.Item size="size.half">
@@ -239,6 +247,7 @@ class SendConfirmationTaskModule extends React.Component<SendConfirmationTaskMod
                                     <Loader id="sendingLoader" className="hiddenLoader sendingLoader" size="smallest" label={this.localize("PreparingMessageLabel")} labelPosition="end" />
                                 </Flex.Item>
                                 <Button content={this.localize("Send")} id="sendBtn" onClick={this.onSendMessage} primary />
+                                {/*onClick={this.onSendMessage}*/}
                             </Flex>
                         </Flex>
                     </Flex>

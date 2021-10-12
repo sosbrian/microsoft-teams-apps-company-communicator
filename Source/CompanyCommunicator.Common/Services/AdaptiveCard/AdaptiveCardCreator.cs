@@ -7,6 +7,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
 {
     using System;
     using System.Collections.Generic;
+    using System.Web;
     using AdaptiveCards;
     using Microsoft.Extensions.Options;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
@@ -150,8 +151,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
             var summarySize = AdaptiveTextSize.Default;
             var summaryHorizontalAlignment = AdaptiveHorizontalAlignment.Left;
             var summaryColor = AdaptiveTextColor.Default;
+            var encodedSummary = HttpUtility.HtmlEncode(summary);
             var taskmodulevideoURL = "https://teams.microsoft.com/l/task/" + this.taskModuleAppID + "?url=" + this.appServiceUri + "/player.html?vid=" + videoUrl + "&height=700&width=1000&title=Video%20Player";
-
             if (!string.IsNullOrWhiteSpace(senderTemplate))
             {
                 card.Body.Add(new AdaptiveContainer()

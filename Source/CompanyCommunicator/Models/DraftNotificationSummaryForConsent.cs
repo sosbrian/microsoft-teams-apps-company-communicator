@@ -43,6 +43,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public string UploadedListName { get; set; }
 
         /// <summary>
+        /// Gets or sets email option.
+        /// </summary>
+        public bool EmailOption { get; set; }
+
+        /// <summary>
         /// Gets or sets Exclusion List value.
         /// </summary>
         public string ExclusionList { get; set; }

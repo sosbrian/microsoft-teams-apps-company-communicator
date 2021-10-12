@@ -22,6 +22,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams;
     using Microsoft.Teams.Apps.CompanyCommunicator.Send.Func.Services;
     using Newtonsoft.Json;
+    //Testing
+    using System.Collections.Generic;
+    using Microsoft.Graph;
+    using System.Net.Http.Headers;
+    using Microsoft.Identity.Client;
+    using Microsoft.IdentityModel.Clients;
+    using Microsoft.IdentityModel.Clients.ActiveDirectory;
+    using Attachment = Bot.Schema.Attachment;
+    using System.Web;
+    using System.Net;
+    using AdaptiveCards;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
 
     /// <summary>
     /// Azure Function App triggered by messages from a Service Bus queue
@@ -37,19 +49,39 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         private static readonly int MaxDeliveryCountForDeadLetter = 10;
         private static readonly string AdaptiveCardContentType = "application/vnd.microsoft.card.adaptive";
 
+        private readonly string emailSenderAadId;
+        private readonly string tenantId;
+        private readonly string originatorId;
+        private readonly string authorAppId;
+        private readonly string authorAppPassword;
+        private readonly string appServiceUri;
+
         private readonly int maxNumberOfAttempts;
         private readonly double sendRetryDelayNumberOfSeconds;
         private readonly INotificationService notificationService;
+        private readonly INotificationDataRepository notificationDataRepository;
         private readonly ISendingNotificationDataRepository notificationRepo;
         private readonly IMessageService messageService;
         private readonly ISendQueue sendQueue;
         private readonly IStringLocalizer<Strings> localizer;
+
+        // Test Email Option Start
+        // string tenantId = "e9d92cab-dc7d-443a-ba31-e4dc4cb27a08";
+        // string clientId = "7a5896c2-8ee5-42db-860f-36329a974651";
+        // string clientSecret = "1_oTXmSN_Xz.7w7hRexdQ5C85-p5~UGjY2";
+        // string userId = "19baaacc-7c87-47f6-a399-77ceb5d28de1";
+        //string originator = "adf0a09a-1b24-43ff-acda-8e8305c608b9";
+        string[] scopes = new string[] { "https://graph.microsoft.com/.default" };
+        AdaptiveCard aCard;
+
+        // Test Email Option End
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SendFunction"/> class.
         /// </summary>
         /// <param name="options">Send function options.</param>
         /// <param name="notificationService">The service to precheck and determine if the queue message should be processed.</param>
+        /// <param name="notificationDataRepository">The service to precheck and determine should be send email.</param>
         /// <param name="messageService">Message service.</param>
         /// <param name="notificationRepo">Notification repository.</param>
         /// <param name="sendQueue">The send queue.</param>
@@ -57,6 +89,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         public SendFunction(
             IOptions<SendFunctionOptions> options,
             INotificationService notificationService,
+            INotificationDataRepository notificationDataRepository,
             IMessageService messageService,
             ISendingNotificationDataRepository notificationRepo,
             ISendQueue sendQueue,
@@ -67,10 +100,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 throw new ArgumentNullException(nameof(options));
             }
 
+            this.emailSenderAadId = options.Value.EmailSenderAadId;
+            this.tenantId = options.Value.TenantId;
+            this.originatorId = options.Value.OriginatorId;
+            this.authorAppId = options.Value.AuthorAppId;
+            this.authorAppPassword = options.Value.AuthorAppPassword;
+            this.appServiceUri = options.Value.AppServiceUri;
+
             this.maxNumberOfAttempts = options.Value.MaxNumberOfAttempts;
             this.sendRetryDelayNumberOfSeconds = options.Value.SendRetryDelayNumberOfSeconds;
 
             this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
+            this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository));
             this.messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
             this.sendQueue = sendQueue ?? throw new ArgumentNullException(nameof(sendQueue));
@@ -106,6 +147,29 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
             try
             {
+                // Init Graph.
+                IConfidentialClientApplication confidentialClient = ConfidentialClientApplicationBuilder
+                .Create(this.authorAppId)
+                .WithClientSecret(this.authorAppPassword)
+                .WithAuthority(new Uri($"https://login.microsoftonline.com/" + this.tenantId + "/v2.0"))
+                .Build();
+
+                // Retrieve an access token for Microsoft Graph (gets a fresh token if needed).
+                var authResult = await confidentialClient
+                        .AcquireTokenForClient(this.scopes)
+                        .ExecuteAsync().ConfigureAwait(false);
+
+                var token = authResult.AccessToken;
+                // Build the Microsoft Graph client. As the authentication provider, set an async lambda
+                // which uses the MSAL client to obtain an app-only access token to Microsoft Graph,
+                // and inserts this access token in the Authorization header of each API request. 
+                GraphServiceClient graphServiceClient =
+                    new GraphServiceClient(new DelegateAuthenticationProvider(async (requestMessage) =>
+                    {
+                        // Add the access token in the Authorization header of the API request.
+                        requestMessage.Headers.Authorization =
+                                    new AuthenticationHeaderValue("Bearer", token);
+                    }));
                 // Check if recipient is a guest user.
                 if (messageContent.IsRecipientGuestUser())
                 {
@@ -179,6 +243,52 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
                 // Process response.
                 await this.ProcessResponseAsync(messageContent, response, log);
+
+                // Send Adaptive Card to Email.
+                var notificationId = messageContent.NotificationId;
+                var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
+                var recData = messageContent.RecipientData.RecipientId;
+                if (notificationEntity.EmailOption)
+                {
+                    string json = this.aCard.ToJson()
+                    .Replace("\"type\": \"AdaptiveCard\",", $"\"type\": \"AdaptiveCard\",\"originator\":\"{this.originatorId}\",")
+                    .Replace("\\n", "\\n\\r")
+                    .Replace("&lt;", "<")
+                    .Replace("&gt;", ">")
+                    .Replace("&quot;", "&ldquo;")
+                    .Replace("&amp;", "&")
+                    .Replace("&#39;", "'")
+                    .Replace("\"type\": \"Action.Submit\",", $"\"type\": \"Action.Http\",\"method\": \"GET\", \"url\": \"{this.appServiceUri}/api/Survey/Result?notificationId={notificationId}&aadid={recData}&reaction={{{{Reaction.value}}}}&freetext={{{{FreeTextSurvey.value}}}}&yesno={{{{YesNo.value}}}}\",");
+                    var sendMail2User = await graphServiceClient.Users[recData]
+                        .Request()
+                        .Select("userPrincipalName")
+                        .GetAsync();
+                    var message = new Message
+                    {
+                        Subject = "Company Communicator Sent a card",
+                        Body = new ItemBody
+                        {
+                            ContentType = BodyType.Html,
+                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br/></body></html>",
+                        },
+                        ToRecipients = new List<Recipient>()
+                    {
+                        new Recipient
+                        {
+                            EmailAddress = new EmailAddress
+                            {
+                                Address = sendMail2User.UserPrincipalName,
+                            },
+                        },
+                    },
+                    };
+
+                    await graphServiceClient.Users[this.emailSenderAadId]
+                          .SendMail(message, false)
+                          .Request()
+                          .PostAsync();
+                    return;
+                }
             }
             catch (InvalidOperationException exception)
             {
@@ -266,6 +376,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             var notification = await this.notificationRepo.GetAsync(
                 NotificationDataTableNames.SendingNotificationsPartition,
                 message.NotificationId);
+
+            var parsedResult = AdaptiveCard.FromJson(notification.Content);
+            var card = parsedResult.Card;
+
+            this.aCard = card;
+            notification.Content = notification.Content.Replace("\\n", "\\n\\r");
 
             var adaptiveCardAttachment = new Attachment()
             {

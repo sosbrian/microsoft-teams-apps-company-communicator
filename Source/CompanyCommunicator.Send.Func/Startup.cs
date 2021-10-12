@@ -41,6 +41,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
                     companyCommunicatorSendFunctionOptions.SendRetryDelayNumberOfSeconds =
                         configuration.GetValue<double>("SendRetryDelayNumberOfSeconds", 660);
+                    companyCommunicatorSendFunctionOptions.EmailSenderAadId =
+                        configuration.GetValue<string>("EmailSenderAadId");
+                    companyCommunicatorSendFunctionOptions.TenantId =
+                        configuration.GetValue<string>("TenantId");
+                    companyCommunicatorSendFunctionOptions.OriginatorId =
+                        configuration.GetValue<string>("OriginatorId");
+                    companyCommunicatorSendFunctionOptions.AuthorAppId =
+                        configuration.GetValue<string>("AuthorAppId");
+                    companyCommunicatorSendFunctionOptions.AuthorAppPassword =
+                        configuration.GetValue<string>("AuthorAppPassword");
+                    companyCommunicatorSendFunctionOptions.AppServiceUri =
+                        configuration.GetValue<string>("AppServiceUri");
                 });
             builder.Services.AddOptions<BotOptions>()
                 .Configure<IConfiguration>((botOptions, configuration) =>

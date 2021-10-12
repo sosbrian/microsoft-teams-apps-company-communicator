@@ -251,6 +251,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 GroupNames = groupNames,
                 UploadedList = notificationEntity.UploadedList,
                 UploadedListName = notificationEntity.UploadedListName,
+                EmailOption = notificationEntity.EmailOption,
                 AllUsers = notificationEntity.AllUsers,
                 SendingStartedDate = notificationEntity.SendingStartedDate,
                 ErrorMessage = notificationEntity.ErrorMessage,

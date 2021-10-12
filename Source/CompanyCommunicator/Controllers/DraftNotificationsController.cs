@@ -185,6 +185,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Groups = notification.Groups,
                 UploadedList = notification.UploadedList,
                 UploadedListName = notification.UploadedListName,
+                EmailOption = notification.EmailOption,
                 ExclusionList = notification.ExclusionList,
                 AllUsers = notification.AllUsers,
             };
@@ -304,6 +305,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 Groups = notificationEntity.Groups,
                 UploadedList = notificationEntity.UploadedList,
                 UploadedListName = notificationEntity.UploadedListName,
+                EmailOption = notificationEntity.EmailOption,
                 ExclusionList = notificationEntity.ExclusionList,
                 AllUsers = notificationEntity.AllUsers,
             };
@@ -347,6 +349,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 AllUsers = notificationEntity.AllUsers,
                 UploadedList = notificationEntity.UploadedList,
                 UploadedListName = notificationEntity.UploadedListName,
+                EmailOption = notificationEntity.EmailOption,
                 ExclusionList = notificationEntity.ExclusionList,
             };
 

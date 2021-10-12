@@ -37,6 +37,7 @@ import { CSVReader } from 'react-papaparse';
 import UploadIcon from '@mui/icons-material/Upload';
 import { styled } from '@material-ui/core/styles';
 import { forEachChild } from 'typescript';
+import { Alert } from 'react-alert';
 
 
 type dropdownItem = {
@@ -86,6 +87,7 @@ export interface IDraftMessage {
     groups: any[],
     uploadedList: any[],
     uploadedListName: string,
+    emailOption: boolean,
     exclusionList: string,
     allUsers: boolean
 }
@@ -146,6 +148,7 @@ export interface formState {
     selectedGroups: dropdownItem[],
     uploadedList: any[],
     uploadedListName: string,
+    emailOption: boolean,
     errorImageUrlMessage: string,
     errorVideoUrlMessage: string,
     errorButtonUrlMessage: string,
@@ -427,6 +430,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedGroups: [],
             uploadedList: [],
             uploadedListName: "",
+            emailOption: false,
             errorImageUrlMessage: "",
             errorVideoUrlMessage: "",
             errorButtonUrlMessage: "",
@@ -1265,6 +1269,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 selectedGroups: draftMessageDetail.groups,
                 uploadedList: draftMessageDetail.uploadedList,
                 uploadedListName: draftMessageDetail.uploadedListName,
+                emailOption: draftMessageDetail.emailOption,
                 exclusionList: draftMessageDetail.exclusionList
             });
 
@@ -1351,9 +1356,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         } else {
             uploadList = "No file chosen";
         }
-        const hiddenDiv = {
-            display: 'block',
-        };
         const templates = [
             {
                 key: "1", header: "Announcements with image"
@@ -1645,16 +1647,14 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                     autoComplete="off"
                                                     fluid
                                                 />
-                                                <div className="test2" style={hiddenDiv}>
-                                                    <Input fluid className="inputField"
-                                                        value={this.state.imageLink}
-                                                        label={this.localize("ImageURL")}
-                                                        placeholder={this.localize("ImageURL")}
-                                                        onChange={this.onImageLinkChanged}
-                                                        error={!(this.state.errorImageUrlMessage === "")}
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
+                                                <Input fluid className="inputField"
+                                                    value={this.state.imageLink}
+                                                    label={this.localize("ImageURL")}
+                                                    placeholder={this.localize("ImageURL")}
+                                                    onChange={this.onImageLinkChanged}
+                                                    error={!(this.state.errorImageUrlMessage === "")}
+                                                    autoComplete="off"
+                                                />
                                                 <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
 
                                                 <div className="textArea">
@@ -2060,16 +2060,14 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                     autoComplete="off"
                                                     fluid
                                                 />
-                                                <div className="test2" style={hiddenDiv}>
-                                                    <Input fluid className="inputField"
-                                                        value={this.state.imageLink}
-                                                        label={this.localize("ImageURL")}
-                                                        placeholder={this.localize("ImageURL")}
-                                                        onChange={this.onImageLinkChanged}
-                                                        error={!(this.state.errorImageUrlMessage === "")}
-                                                        autoComplete="off"
-                                                    />
-                                                </div>
+                                                <Input fluid className="inputField"
+                                                    value={this.state.imageLink}
+                                                    label={this.localize("ImageURL")}
+                                                    placeholder={this.localize("ImageURL")}
+                                                    onChange={this.onImageLinkChanged}
+                                                    error={!(this.state.errorImageUrlMessage === "")}
+                                                    autoComplete="off"
+                                                />
                                                 <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
 
                                                 <div className="textArea">
@@ -2497,7 +2495,9 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                 <FormControlLabel
                                                     control={
                                                         <Switch
-                                                            disabled
+                                                            checked={this.state.emailOption}
+                                                            value={this.state.emailOption}
+                                                            onChange={this.emailOptionOnChanged}
                                                             color="primary"
                                                         />
                                                     }
@@ -3568,6 +3568,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             groups: selectedGroups,
             uploadedList: this.state.uploadedList,
             uploadedListName: this.state.uploadedListName,
+            emailOption: this.state.emailOption,
             allUsers: this.state.allUsersOptionSelected,
             exclusionList: this.state.exclusionList
         };
@@ -5011,6 +5012,9 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
     private handleOnDrop = (data: any, file: any) => {
         //console.log('---------------------------')
+        this.setState({
+            uploadedList: []
+        });
         for (let i = 0; i < data.length - 1; i++) {
             //console.log(JSON.stringify(data[i].data).replace(/["+/g, '').replace(/\[|\]|"/g, ""));
             this.setState({
@@ -5096,6 +5100,16 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 // <unknown>
             }
         }
+    }
+
+    private emailOptionOnChanged = () => {
+        this.setState({
+            emailOption: !this.state.emailOption
+        })
+    }
+
+    private testAlert = () => {
+        console.log("OK")
     }
 }
 

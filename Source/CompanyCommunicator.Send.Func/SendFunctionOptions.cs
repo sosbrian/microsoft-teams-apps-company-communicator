@@ -20,5 +20,35 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         /// retrying to send the message.
         /// </summary>
         public double SendRetryDelayNumberOfSeconds { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Email Sender for mail Adaptive Card.
+        /// </summary>
+        public string EmailSenderAadId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TenantId for mail Adaptive Card.
+        /// </summary>
+        public string TenantId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the OriginatorId for Adaptive Card.
+        /// </summary>
+        public string OriginatorId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the AuthorAppId.
+        /// </summary>
+        public string AuthorAppId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the AuthorAppPassword for Adaptive Card.
+        /// </summary>
+        public string AuthorAppPassword { get; set; }
+
+        /// <summary>
+        /// Gets or sets the AppServiceUri for Adaptive Card.
+        /// </summary>
+        public string AppServiceUri { get; set; }
     }
 }

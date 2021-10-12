@@ -277,6 +277,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         public string UploadedListName { get; set; }
 
         /// <summary>
+        /// Gets or sets Email Option.
+        /// </summary>
+        public bool EmailOption { get; set; }
+
+        /// <summary>
         /// Gets or sets the exlusion list.
         /// </summary>
         public string ExclusionList { get; set; }

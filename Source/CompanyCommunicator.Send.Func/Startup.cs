@@ -107,6 +107,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
             // Add the Notification service.
             builder.Services.AddTransient<INotificationService, NotificationService>();
+
+            // Add the Notification Repository.
+            builder.Services.AddSingleton<INotificationDataRepository, NotificationDataRepository>();
         }
     }
 }

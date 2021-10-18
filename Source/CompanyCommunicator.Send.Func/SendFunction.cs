@@ -49,28 +49,23 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         private static readonly int MaxDeliveryCountForDeadLetter = 10;
         private static readonly string AdaptiveCardContentType = "application/vnd.microsoft.card.adaptive";
 
-        private readonly string emailSenderAadId;
-        private readonly string tenantId;
-        private readonly string originatorId;
-        private readonly string authorAppId;
-        private readonly string authorAppPassword;
+        private readonly string emailSenderAadId; // string userId = "19baaacc-7c87-47f6-a399-77ceb5d28de1";
+        private readonly string tenantId; // string tenantId = "e9d92cab-dc7d-443a-ba31-e4dc4cb27a08";
+        private readonly string originatorId; // string originator = "adf0a09a-1b24-43ff-acda-8e8305c608b9";
+        private readonly string authorAppId; // string clientId = "7a5896c2-8ee5-42db-860f-36329a974651";
+        private readonly string authorAppPassword; // string clientSecret = "1_oTXmSN_Xz.7w7hRexdQ5C85-p5~UGjY2";
         private readonly string appServiceUri;
 
         private readonly int maxNumberOfAttempts;
         private readonly double sendRetryDelayNumberOfSeconds;
         private readonly INotificationService notificationService;
-        private readonly INotificationDataRepository notificationDataRepository;
+        private readonly INotificationDataRepository notificationDataRepository; // Testing Check Email Option
         private readonly ISendingNotificationDataRepository notificationRepo;
         private readonly IMessageService messageService;
         private readonly ISendQueue sendQueue;
         private readonly IStringLocalizer<Strings> localizer;
 
         // Test Email Option Start
-        // string tenantId = "e9d92cab-dc7d-443a-ba31-e4dc4cb27a08";
-        // string clientId = "7a5896c2-8ee5-42db-860f-36329a974651";
-        // string clientSecret = "1_oTXmSN_Xz.7w7hRexdQ5C85-p5~UGjY2";
-        // string userId = "19baaacc-7c87-47f6-a399-77ceb5d28de1";
-        //string originator = "adf0a09a-1b24-43ff-acda-8e8305c608b9";
         string[] scopes = new string[] { "https://graph.microsoft.com/.default" };
         AdaptiveCard aCard;
 
@@ -89,7 +84,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         public SendFunction(
             IOptions<SendFunctionOptions> options,
             INotificationService notificationService,
-            INotificationDataRepository notificationDataRepository,
+            INotificationDataRepository notificationDataRepository, // Testing Check Email Option
             IMessageService messageService,
             ISendingNotificationDataRepository notificationRepo,
             ISendQueue sendQueue,
@@ -111,7 +106,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             this.sendRetryDelayNumberOfSeconds = options.Value.SendRetryDelayNumberOfSeconds;
 
             this.notificationService = notificationService ?? throw new ArgumentNullException(nameof(notificationService));
-            this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository));
+            this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository)); // Testing Check Email Option
             this.messageService = messageService ?? throw new ArgumentNullException(nameof(messageService));
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
             this.sendQueue = sendQueue ?? throw new ArgumentNullException(nameof(sendQueue));
@@ -170,6 +165,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         requestMessage.Headers.Authorization =
                                     new AuthenticationHeaderValue("Bearer", token);
                     }));
+
                 // Check if recipient is a guest user.
                 if (messageContent.IsRecipientGuestUser())
                 {
@@ -246,9 +242,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
                 // Send Adaptive Card to Email.
                 var notificationId = messageContent.NotificationId;
-                var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
+                var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId); // Testing Check Email Option
                 var recData = messageContent.RecipientData.RecipientId;
-                if (notificationEntity.EmailOption)
+                if (notificationEntity.EmailOption) 
                 {
                     string json = this.aCard.ToJson()
                     .Replace("\"type\": \"AdaptiveCard\",", $"\"type\": \"AdaptiveCard\",\"originator\":\"{this.originatorId}\",")

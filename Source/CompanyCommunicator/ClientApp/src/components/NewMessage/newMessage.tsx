@@ -19,25 +19,14 @@ import {
 import { getBaseUrl } from '../../configVariables';
 import { ImageUtil } from '../../utility/imageutility';
 import { TFunction } from "i18next";
-//Using material-ui PublishIcon
-import IconButton from '@material-ui/core/IconButton';
-import PublishIcon from '@material-ui/icons/Publish';
-import { faAlignLeft, faAlignCenter, faAlignRight, faBold, faFont, faUpload } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { Switch, FormLabel, FormControl, FormGroup, FormControlLabel, FormHelperText, Grid } from '@material-ui/core';
-//import Button as Button1 } from '@mui/material/Button';
+import { Switch, FormControlLabel, Grid } from '@material-ui/core';
 import { ToggleButton, ToggleButtonGroup } from '@material-ui/lab';
-//import Paper from '@material-ui/lab';
 import FormatBoldIcon from '@material-ui/icons/FormatBold';
 import FontDownloadIcon from '@material-ui/icons/FontDownload';
 import FormatAlignLeftIcon from '@material-ui/icons/FormatAlignLeft';
 import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter';
 import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 import { CSVReader } from 'react-papaparse';
-import UploadIcon from '@mui/icons-material/Upload';
-import { styled } from '@material-ui/core/styles';
-import { forEachChild } from 'typescript';
-import { Alert } from 'react-alert';
 
 
 type dropdownItem = {
@@ -375,7 +364,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             }
         ;
         //this.setDefaultCard(this.card);
-        //
         this.state = {
             template: "",
             senderTemplate: "",
@@ -409,7 +397,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             linkToSurvey: "",
             card: this.card,
             page: "TemplateSelection",
-            //page: "TemplateSelection",AudienceSelection
             teamsOptionSelected: true,
             rostersOptionSelected: false,
             allUsersOptionSelected: false,
@@ -1224,7 +1211,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
     private getGroupData = async (id: number) => {
         try {
-            console.log("id" + id)
             const response = await getGroups(id);
             this.setState({
                 groups: response.data
@@ -1232,7 +1218,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             
         }
         catch (error) {
-            console.log("error" + error)
             return error;
         }
     }
@@ -1241,7 +1226,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         try {
             const response = await getDraftNotification(id);
             const draftMessageDetail = response.data;
-            console.log("response: " + response);
             let selectedRadioButton = "teams";
             if (draftMessageDetail.rosters.length > 0) {
                 selectedRadioButton = "rosters";
@@ -4995,7 +4979,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     }
 
     private handleSelectedFile = (event: any) => {
-        //Papa.parse([])
         if (event.target.files[0]) {
             this.setState({
                 selectedFile: event.target.files[0],
@@ -5006,17 +4989,11 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         //console.log(event.target.files[0]);
     }
 
-    private resetCSVReader = () => {
-
-    }
-
     private handleOnDrop = (data: any, file: any) => {
-        //console.log('---------------------------')
         this.setState({
             uploadedList: []
         });
         for (let i = 0; i < data.length - 1; i++) {
-            //console.log(JSON.stringify(data[i].data).replace(/["+/g, '').replace(/\[|\]|"/g, ""));
             this.setState({
                 uploadedList: this.state.uploadedList.concat(JSON.stringify(data[i].data).replace(/['"]"+/g, '').replace(/\[|\]|"/g, "")),
                 uploadedListName: file.name,
@@ -5029,8 +5006,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 resetCSVReader: false
             })
         }
-        //console.log('---------------------------')
-        //console.log(file.name)
     }
 
     private handleOnError = (err: any , file: any, inputElem:any , reason:any) => {
@@ -5041,22 +5016,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         //console.log('---------------------------')
         //console.log(data)
         //console.log('---------------------------')
-    }
-
-    private testGetUser = async () => {
-        try {
-            const response = await getUsers();
-            //this.setState({
-            //    teams: response.data
-            //});
-            //console.log(response.data)
-        } catch (error) {
-            return error;
-        }
-    }
-
-    private testConsole = () => {
-        console.log(this.state.exclusionList)
     }
 
     private onExclusionListChanged = (event: any) => {
@@ -5106,10 +5065,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setState({
             emailOption: !this.state.emailOption
         })
-    }
-
-    private testAlert = () => {
-        console.log("OK")
     }
 }
 

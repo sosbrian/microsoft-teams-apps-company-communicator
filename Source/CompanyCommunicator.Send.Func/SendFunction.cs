@@ -6,34 +6,27 @@
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 {
     using System;
+    using System.Collections.Generic;
+    using System.Net.Http.Headers;
     using System.Threading.Tasks;
+    using AdaptiveCards;
     using Microsoft.Azure.WebJobs;
     using Microsoft.Bot.Builder;
     using Microsoft.Bot.Schema;
     using Microsoft.Extensions.Localization;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Microsoft.Graph;
+    using Microsoft.Identity.Client;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Extensions;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Resources;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.SendQueue;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGraph;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.Teams;
     using Microsoft.Teams.Apps.CompanyCommunicator.Send.Func.Services;
     using Newtonsoft.Json;
-    //Testing
-    using System.Collections.Generic;
-    using Microsoft.Graph;
-    using System.Net.Http.Headers;
-    using Microsoft.Identity.Client;
-    using Microsoft.IdentityModel.Clients;
-    using Microsoft.IdentityModel.Clients.ActiveDirectory;
-    using Attachment = Bot.Schema.Attachment;
-    using System.Web;
-    using System.Net;
-    using AdaptiveCards;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
+    using Attachment = Microsoft.Bot.Schema.Attachment;
 
     /// <summary>
     /// Azure Function App triggered by messages from a Service Bus queue
@@ -49,17 +42,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         private static readonly int MaxDeliveryCountForDeadLetter = 10;
         private static readonly string AdaptiveCardContentType = "application/vnd.microsoft.card.adaptive";
 
-        private readonly string emailSenderAadId; // string userId = "19baaacc-7c87-47f6-a399-77ceb5d28de1";
-        private readonly string tenantId; // string tenantId = "e9d92cab-dc7d-443a-ba31-e4dc4cb27a08";
-        private readonly string originatorId; // string originator = "adf0a09a-1b24-43ff-acda-8e8305c608b9";
-        private readonly string authorAppId; // string clientId = "7a5896c2-8ee5-42db-860f-36329a974651";
-        private readonly string authorAppPassword; // string clientSecret = "1_oTXmSN_Xz.7w7hRexdQ5C85-p5~UGjY2";
+        private readonly string emailSenderAadId;
+        private readonly string tenantId;
+        private readonly string originatorId;
+        private readonly string authorAppId;
+        private readonly string authorAppPassword;
         private readonly string appServiceUri;
 
         private readonly int maxNumberOfAttempts;
         private readonly double sendRetryDelayNumberOfSeconds;
         private readonly INotificationService notificationService;
-        private readonly INotificationDataRepository notificationDataRepository; // Testing Check Email Option
+        private readonly INotificationDataRepository notificationDataRepository;
         private readonly ISendingNotificationDataRepository notificationRepo;
         private readonly IMessageService messageService;
         private readonly ISendQueue sendQueue;
@@ -155,6 +148,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         .ExecuteAsync().ConfigureAwait(false);
 
                 var token = authResult.AccessToken;
+
                 // Build the Microsoft Graph client. As the authentication provider, set an async lambda
                 // which uses the MSAL client to obtain an app-only access token to Microsoft Graph,
                 // and inserts this access token in the Authorization header of each API request. 
@@ -215,19 +209,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     return;
                 }
 
-                //Exclude Me
-                //if (messageContent.RecipientData.RecipientId == "19baaacc-7c87-47f6-a399-77ceb5d28de1")
-                //{
-                //    await this.notificationService.UpdateSentNotification(
-                //        notificationId: messageContent.NotificationId,
-                //        recipientId: messageContent.RecipientData.RecipientId,
-                //        totalNumberOfSendThrottles: 0,
-                //        statusCode: SentNotificationDataEntity.FinalFaultedStatusCode,
-                //        allSendStatusCodes: $"{SentNotificationDataEntity.FinalFaultedStatusCode},",
-                //        errorMessage: this.localizer.GetString("AppNotInstalled"));
-                //    return;
-                //}
-
                 // Send message.
                 var messageActivity = await this.GetMessageActivity(messageContent);
                 var response = await this.messageService.SendMessageAsync(
@@ -244,10 +225,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 var notificationId = messageContent.NotificationId;
                 var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId); // Testing Check Email Option
                 var recData = messageContent.RecipientData.RecipientId;
-                if (notificationEntity.EmailOption) 
+                if (notificationEntity.EmailOption)
                 {
                     string json = this.aCard.ToJson()
                     .Replace("\"type\": \"AdaptiveCard\",", $"\"type\": \"AdaptiveCard\",\"originator\":\"{this.originatorId}\",")
+                    .Replace("\"version\": \"1.2\",", "\"version\": \"1.0\",")
                     .Replace("\\n", "\\n\\r")
                     .Replace("&lt;", "<")
                     .Replace("&gt;", ">")
@@ -261,11 +243,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         .GetAsync();
                     var message = new Message
                     {
-                        Subject = "Company Communicator Sent a card",
+                        Subject = "Company Communicator: " + notificationEntity.Title,
                         Body = new ItemBody
                         {
                             ContentType = BodyType.Html,
-                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br/></body></html>",
+                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.</body></html>",
                         },
                         ToRecipients = new List<Recipient>()
                     {

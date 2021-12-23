@@ -35,6 +35,7 @@
     "react-dom": "^16.8.6",
     "react-highlight-words": "^0.16.0",
     "react-i18next": "^11.7.0",
+    "react-image-file-resizer": "^0.4.7",
     "react-papaparse": "^3.17.2",
     "react-redux": "^7.1.0",
     "react-router-dom": "^5.2.0",

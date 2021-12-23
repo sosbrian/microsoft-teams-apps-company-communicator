@@ -43,7 +43,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
         /// </summary>
         /// <param name="notificationDataEntity">Notification data entity.</param>
         /// <returns>An adaptive card.</returns>
-        public virtual AdaptiveCard CreateAdaptiveCard(NotificationDataEntity notificationDataEntity)
+        public virtual AdaptiveCard CreateAdaptiveCard(NotificationDataEntity notificationDataEntity,
+            bool submitted = false)
         {
             return this.CreateAdaptiveCard(
                 notificationDataEntity.SenderTemplate,
@@ -75,7 +76,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                 notificationDataEntity.YesNoQuestion,
                 notificationDataEntity.SurLinkToSurvey,
                 notificationDataEntity.LinkToSurvey,
-                notificationDataEntity.Id);
+                notificationDataEntity.Id,
+                submitted);
         }
 
         /// <summary>
@@ -141,7 +143,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
             string yesNoQuestion,
             bool surLinkToSurvey,
             string linkToSurvey,
-            string notificationId)
+            string notificationId,
+            bool submitted = false)
         {
             var version = new AdaptiveSchemaVersion(1, 2);
             AdaptiveCard card = new AdaptiveCard(version);
@@ -354,7 +357,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                 });
             }
 
-            if (surReaction)
+            if (surReaction && !submitted)
             {
                 var reactchoices = new List<AdaptiveChoice>();
                 reactchoices.Add(new AdaptiveChoice()
@@ -394,11 +397,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                     Id = "Reaction",
                     Style = AdaptiveChoiceInputStyle.Expanded,
                     IsMultiSelect = false,
+                    IsRequired = true,
                     Choices = reactchoices,
                 });
             }
 
-            if (surFreeText)
+            if (surFreeText && !submitted)
             {
                 card.Body.Add(new AdaptiveTextBlock()
                 {
@@ -411,11 +415,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                     Id = "FreeTextSurvey",
                     Placeholder = "Enter Text Here",
                     MaxLength = 500,
+                    IsRequired = true,
                     IsMultiline = true,
                 });
             }
 
-            if (surYesNo)
+            if (surYesNo && !submitted)
             {
                 var yesnochoices = new List<AdaptiveChoice>();
                 yesnochoices.Add(new AdaptiveChoice()
@@ -440,11 +445,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                     Id = "YesNo",
                     Style = AdaptiveChoiceInputStyle.Expanded,
                     IsMultiSelect = false,
+                    IsRequired = true,
                     Choices = yesnochoices,
                 });
             }
 
-            if (surYesNo || surReaction || surFreeText)
+            if ((surYesNo || surReaction || surFreeText) && !submitted)
             {
                 card.Body.Add(new AdaptiveActionSet()
                 {
@@ -453,11 +459,47 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                         new AdaptiveSubmitAction()
                         {
                             Title = "Submit",
-                            Data = "Submit",
+                            Id = "submitSurvey",
+                            //Data = "Submit",
+                            //Data = JsonConvert.SerializeObject(
+                            //    new {msteams = JsonConvert.SerializeObject(
+                            //        new {type = "task/fetch"}
+                            //        ),
+                            //        data = "Invoke"
+                            //    }),
                             DataJson = JsonConvert.SerializeObject(
-                        new { notificationId = notificationId }),
+                                new
+                                {
+                                    notificationId = notificationId,
+                                }),
                         },
                     },
+                });
+            }
+
+            if (submitted)
+            {
+                card.Body.Add(new AdaptiveTextBlock()
+                {
+                    Text = "Submitted",
+                    Size = AdaptiveTextSize.Large,
+                    Weight = AdaptiveTextWeight.Bolder,
+                    HorizontalAlignment = AdaptiveHorizontalAlignment.Center,
+                    Color = AdaptiveTextColor.Dark,
+                    Wrap = true,
+                });
+            }
+
+            if (submitted)
+            {
+                card.Body.Add(new AdaptiveTextBlock()
+                {
+                    Text = "Thank you for your thoughtful feedback!",
+                    Size = AdaptiveTextSize.Medium,
+                    Weight = AdaptiveTextWeight.Lighter,
+                    HorizontalAlignment = AdaptiveHorizontalAlignment.Center,
+                    Color = AdaptiveTextColor.Dark,
+                    Wrap = true,
                 });
             }
 

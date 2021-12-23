@@ -1,7 +1,9 @@
-// <copyright file="SurveyController.cs" company="Microsoft">
+// <copyright file="GetUpdatedCardController.cs company="Microsoft">
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 // </copyright>
+
+using Microsoft.Bot.Builder.Teams;
 
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
 {
@@ -15,38 +17,48 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.SendQueue;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Bot;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Microsoft.Bot.Builder;
+    using Microsoft.Bot.Builder.Integration.AspNet.Core;
 
     /// <summary>
     /// Controller for saving survey result.
     /// </summary>
-    [Route("api/Survey")]
-    public class SurveyController : ControllerBase
+    [Route("api/GetUpdatedCard")]
+    public class GetUpdatedCardController : ControllerBase
     {
         private readonly ISendingNotificationDataRepository notificationRepo;
         private readonly INotificationDataRepository notificationDataRepository;
         private readonly ISentNotificationDataRepository sentNotificationDataRepository;
         private readonly AdaptiveCardCreator adaptiveCardCreator;
+        private readonly BotFrameworkHttpAdapter adapter;
+        private readonly IBot authorBot;
+        private readonly IBot userBot;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SurveyController"/> class.
+        /// Initializes a new instance of the <see cref="GetUpdatedCardController"/> class.
         /// </summary>
         /// <param name="sentNotificationDataRepository">Sent notification data repository instance.</param>
         /// <param name="notificationDataRepository">Sent notification data repository instance. Whatvever la. Who cares param.</param>
         /// <param name="notificationRepo">Sent notification data repository instance. Whatvever la. Who cares param. WFC.</param>
-        /// <param name="adaptiveCardCreator">Create Adaptive card.</param>
-        public SurveyController(
+        public GetUpdatedCardController(
             INotificationDataRepository notificationDataRepository,
             ISendingNotificationDataRepository notificationRepo,
             AdaptiveCardCreator adaptiveCardCreator,
-            ISentNotificationDataRepository sentNotificationDataRepository)
+            ISentNotificationDataRepository sentNotificationDataRepository,
+            CompanyCommunicatorBotAdapter adapter,
+            AuthorTeamsActivityHandler authorBot,
+            UserTeamsActivityHandler userBot)
         {
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
             this.adaptiveCardCreator = adaptiveCardCreator ?? throw new ArgumentException(nameof(adaptiveCardCreator));
             this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository)); //Get Card
             this.sentNotificationDataRepository = sentNotificationDataRepository ?? throw new ArgumentException(nameof(sentNotificationDataRepository));
+            this.adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
+            this.authorBot = authorBot ?? throw new ArgumentNullException(nameof(authorBot));
+            this.userBot = userBot ?? throw new ArgumentNullException(nameof(userBot));
         }
 
         /// <summary>
@@ -54,17 +66,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// </summary>
         /// <param name="notificationId">Notification ID.</param>
         /// <param name="aadid">AAD ID of the user.</param>
-        /// <param name="reaction">Reaction Survey Response.</param>
-        /// <param name="freetext">Free Text Survey Response.</param>
-        /// <param name="yesno">Yes/No Survey Response.</param>
         /// <returns>The result of an action method.</returns>
         [HttpGet("Result")]
         public async Task<IActionResult> PostSurveyResponse(
             [FromQuery] string notificationId,
-            [FromQuery] string aadid,
-            [FromQuery] string reaction,
-            [FromQuery] string freetext,
-            [FromQuery] string yesno)
+            [FromQuery] string aadid)
         {
             var notification = await this.sentNotificationDataRepository.GetAsync(
                 partitionKey: notificationId,
@@ -72,47 +78,39 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             //var tempNotification = await this.notificationRepo.GetAsync(
             //    NotificationDataTableNames.SendingNotificationsPartition,
             //    notificationId);
+            //var entityNotification = await this.sentNotificationDataRepository.GetAsync(
+            //    NotificationDataTableNames.SentNotificationsPartition,
+            //    notificationId);
             var textNotification = await this.notificationDataRepository.GetAsync(
                 NotificationDataTableNames.SentNotificationsPartition,
                 notificationId);
             var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true);
             var test = vCard.ToJson()
                 .Replace("\"version\": \"1.2\",", "\"version\": \"1.0\",")
-                .Replace("\\n", "\\n\\r")
-                .Replace("\r\n", string.Empty);
-            // if(textNotification.)
-            if ((textNotification.SurReaction == true && reaction == "{{Reaction.value}}")
-                || (textNotification.SurFreeText == true && freetext == null)
-                || (textNotification.SurYesNo == true && yesno == "{{YesNo.value}}"))
+                .Replace("\\n", "\\n\\r");
+                //.Replace("\r\n", string.Empty);
+
+            if ((textNotification.SurReaction == true && notification.ReactionResult == string.Empty)
+                || (textNotification.SurFreeText == true && notification.FreeTextResult == string.Empty)
+                || (textNotification.SurYesNo == true && notification.YesNoResult == string.Empty))
             {
-                return this.BadRequest("Result Not Found.");
+                return this.NoContent();
             }
 
-            //if (textNotification.SurFreeText == true && freetext == null)
-            //{
-            //    return this.NotFound("Result Not Found.");
-            //}
+            //this.Response.Headers.Add("CARD-UPDATE-IN-BODY", "true");
 
-            //if (textNotification.SurYesNo == true && yesno == "{{YesNo.value}}")
-            //{
-            //    return this.NotFound("Result Not Found.");
-            //}
-
-            //if (reaction == "{{}}" || freetext == "{{}}" || yesno == "{{}}")
-            //{
-            //    return this.NotFound("Result Not Found.");
-            //}
-
-            // Update notification.
-            notification.ReactionResult = reaction;
-            notification.FreeTextResult = freetext;
-            notification.YesNoResult = yesno;
+            // await this.sentNotificationDataRepository.InsertOrMergeAsync(notification);
 
             this.Response.Headers.Add("CARD-UPDATE-IN-BODY", "true");
-
-            await this.sentNotificationDataRepository.InsertOrMergeAsync(notification);
-
             return this.Ok(test);
+        }
+
+        [HttpGet("TeamsResult")]
+        public async Task<IActionResult> PostTeamsSurveyResponse(
+            [FromQuery] string notificationId,
+            [FromQuery] string aadid)
+        {
+            return this.NoContent();
         }
     }
 }

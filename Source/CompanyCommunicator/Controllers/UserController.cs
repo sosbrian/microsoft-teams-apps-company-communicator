@@ -19,7 +19,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     /// Controller for the user data.
     /// </summary>
     [Route("api/user")]
-    [Authorize(PolicyNames.MustBeValidUpnPolicy)]
+    //[Authorize(PolicyNames.MustBeValidUpnPolicy)]
     public class UserController : ControllerBase
     {
         private readonly IUsersService usersService;

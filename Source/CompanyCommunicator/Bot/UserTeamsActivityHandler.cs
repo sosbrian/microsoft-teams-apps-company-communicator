@@ -92,6 +92,32 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
             }
         }
 
+        protected virtual async Task<InvokeResponse> OnTeamsCardActionInvokeAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellation)
+        {
+            if (!string.IsNullOrEmpty(turnContext.Activity.ReplyToId))
+            {
+                var txt = turnContext.Activity.Text;
+                dynamic value = turnContext.Activity.Value;
+                if (string.IsNullOrEmpty(txt) && value != null)
+                {
+                    string notificationId = value["notificationId"];
+                    string reactionResult = value["Reaction"];
+                    string freeTextResult = value["FreeTextSurvey"];
+                    string yesNoResult = value["YesNo"];
+
+                    var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
+
+                    if ((notificationEntity.SurReaction == true && reactionResult == null)
+                        || (notificationEntity.SurFreeText == true && freeTextResult == null)
+                        || (notificationEntity.SurYesNo == true && yesNoResult == null))
+                    {
+                        throw new InvokeResponseException(HttpStatusCode.NotImplemented);
+                    }
+                }
+            }
+            throw new InvokeResponseException(HttpStatusCode.NotImplemented);
+        }
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrEmpty(turnContext.Activity.ReplyToId))
@@ -109,13 +135,21 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
 
                     var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
 
-                    //var card = this.adaptiveCardCreator.CreateAdaptiveCard(notificationEntity, true);
+                    if ((notificationEntity.SurReaction == true && reactionResult == null)
+                        || (notificationEntity.SurFreeText == true && freeTextResult == null)
+                        || (notificationEntity.SurYesNo == true && yesNoResult == null))
+                    {
+                        return;
+                    }
 
-                    //var adaptiveCardAttachment = new Attachment()
-                    //{
-                    //    ContentType = AdaptiveCard.ContentType,
-                    //    Content = card,
-                    //};
+                    var card = this.adaptiveCardCreator.CreateAdaptiveCard(notificationEntity, true);
+                    var updatedCard = card.ToJson().Replace("\\n", "\\n\\r");
+
+                    var adaptiveCardAttachment = new Attachment()
+                    {
+                        ContentType = AdaptiveCard.ContentType,
+                        Content = JsonConvert.DeserializeObject(updatedCard),
+                    };
 
                     var activity = turnContext.Activity;
                     var properties = new Dictionary<string, string>
@@ -149,13 +183,15 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
                     //    return;
                     //}
                     await this.UpdateSentNotificationSurvey(
-                            notificationId: notificationId,
-                            recipientId: activity.From?.AadObjectId,
-                            reactionResult: reactionResult,
-                            freeTextResult: freeTextResult,
-                            yesNoResult: yesNoResult
-                        );
-
+                        notificationId: notificationId,
+                        recipientId: activity.From?.AadObjectId,
+                        reactionResult: reactionResult,
+                        freeTextResult: freeTextResult,
+                        yesNoResult: yesNoResult
+                    );
+                    var newActivity = MessageFactory.Attachment(adaptiveCardAttachment);
+                    newActivity.Id = turnContext.Activity.ReplyToId;
+                    await turnContext.UpdateActivityAsync(newActivity, cancellationToken);
                 }
             }
             else

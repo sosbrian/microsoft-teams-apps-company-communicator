@@ -61,6 +61,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         // Test Email Option Start
         string[] scopes = new string[] { "https://graph.microsoft.com/.default" };
         AdaptiveCard aCard;
+        AdaptiveCard teamsCard;
 
         // Test Email Option End
 
@@ -227,9 +228,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 var recData = messageContent.RecipientData.RecipientId;
                 if (notificationEntity.EmailOption)
                 {
+                    //string tJson = "{\"type\":\"AdaptiveCard\",\"originator\":\"ae832c7e-ad1e-4fda-9c9d-e9a98ac84dfb\",\"version\":\"1.0\",\"body\":[{\"type\":\"Container\",\"backgroundImage\":{\"url\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAHYcAAB2HAY/l8WUAAAATSURBVChTY7gs6IoHjUpjQYKuAHs0dAUXB9EuAAAAAElFTkSuQmCC\",\"fillMode\":\"repeat\",\"horizontalAlignment\":\"center\",\"verticalAlignment\":\"center\"},\"items\":[{\"type\":\"TextBlock\",\"size\":\"medium\",\"weight\":\"bolder\",\"color\":\"light\",\"text\":\"Demo\",\"horizontalAlignment\":\"center\"}],\"bleed\":true},{\"type\":\"TextBlock\",\"size\":\"extraLarge\",\"weight\":\"bolder\",\"text\":\"Outlook Client Demo \",\"wrap\":true},{\"type\":\"Image\",\"size\":\"stretch\",\"url\":\"https://i.ytimg.com/vi/rMXAl05wtzQ/maxresdefault.jpg\",\"altText\":\"\"},{\"type\":\"TextBlock\",\"size\":\"medium\",\"weight\":\"bolder\",\"text\":\"Summary Demo\nSummary Demo\nSummary Demo\nSummary Demo\",\"horizontalAlignment\":\"center\",\"wrap\":true,\"fontType\":\"monospace\"},{\"type\":\"TextBlock\",\"size\":\"small\",\"weight\":\"lighter\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.OpenUrl\",\"url\":\"https://office.com\",\"title\":\"Read More\"}]},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.ChoiceSet\",\"id\":\"Reaction\",\"style\":\"expanded\",\"isMultiSelect\":false,\"choices\":[{\"title\":\"Extremely satisfied\",\"value\":\"1\"},{\"title\":\"Somewhat satisfied\",\"value\":\"2\"},{\"title\":\"Neither satisfied nor dissatisfied\",\"value\":\"3\"},{\"title\":\"Somewhat dissatisfied\",\"value\":\"4\"},{\"title\":\"Extremely dissatisfied\",\"value\":\"5\"}]},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.Text\",\"id\":\"FreeTextSurvey\",\"placeholder\":\"Enter Text Here\",\"isMultiline\":true,\"maxLength\":500},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.ChoiceSet\",\"id\":\"YesNo\",\"style\":\"expanded\",\"isMultiSelect\":false,\"choices\":[{\"title\":\"Yes\",\"value\":\"Yes\"},{\"title\":\"No\",\"value\":\"No\"}]},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.Http\",\"method\":\"GET\",\"url\":\"https://chrischow.ap.ngrok.io/api/Survey/Result?notificationId=2517668294588227007&aadid=19baaacc-7c87-47f6-a399-77ceb5d28de1&reaction={{{{Reaction.value}}}}&freetext={{{{FreeTextSurvey.value}}}}&yesno={{{{YesNo.value}}}}\",\"data\":{\"notificationId\":\"2517668294588227007\"},\"title\":\"Submit\"}]},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.OpenUrl\",\"url\":\"https://office.com\",\"title\":\"Open Survey\"}]}]}";
+                    string teamsJson = this.teamsCard.ToJson();
                     string json = this.aCard.ToJson()
                     .Replace("\"type\": \"AdaptiveCard\",", $"\"type\": \"AdaptiveCard\",\"originator\":\"{this.originatorId}\",")
-                    .Replace("\"version\": \"1.2\",", "\"version\": \"1.0\",")
+                    .Replace("\"version\": \"1.2\",", $"\"version\": \"1.0\",\"autoInvokeAction\": {{\"method\": \"GET\",\"url\": \"{this.appServiceUri}/api/GetUpdatedCard/Result?notificationId={messageContent.NotificationId}&aadid={messageContent.RecipientData.RecipientId}\",\"body\": \"\",\"type\":\"Action.Http\"}},")
                     .Replace("\\n", "\\n\\r")
                     .Replace("&lt;", "<")
                     .Replace("&gt;", ">")
@@ -247,18 +250,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         Body = new ItemBody
                         {
                             ContentType = BodyType.Html,
-                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.</body></html>",
+                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br></body></html>",
+                            //Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + tJson + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(tJson, Formatting.Indented) + "</body></html>",
                         },
                         ToRecipients = new List<Recipient>()
-                    {
-                        new Recipient
                         {
-                            EmailAddress = new EmailAddress
+                            new Recipient
                             {
-                                Address = sendMail2User.UserPrincipalName,
+                                EmailAddress = new EmailAddress
+                                {
+                                    Address = sendMail2User.UserPrincipalName,
+                                },
                             },
                         },
-                    },
                     };
 
                     await graphServiceClient.Users[this.emailSenderAadId]
@@ -358,13 +362,34 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             var parsedResult = AdaptiveCard.FromJson(notification.Content);
             var card = parsedResult.Card;
 
-            this.aCard = card;
-            notification.Content = notification.Content.Replace("\\n", "\\n\\r");
+            //var recipentAadid = message.RecipientData.RecipientId;
+            //var trackImageUrl = $"{this.appServiceUri}/api/GetUpdatedCard/Result?notificationId={message.NotificationId}&aadid={recipentAadid}.gif";
 
+            //var pixel = new AdaptiveImage()
+            //{
+            //    Url = new Uri(trackImageUrl, UriKind.RelativeOrAbsolute),
+            //    Spacing = AdaptiveSpacing.None,
+            //    AltText = string.Empty,
+            //};
+            //pixel.AdditionalProperties.Add("width", "1px");
+            //pixel.AdditionalProperties.Add("height", "1px");
+            //card.Body.Add(pixel);
+            this.teamsCard = card;
+            this.aCard = card;
+            notification.Content = notification.Content
+                .Replace("\\n", "\\n\\r");
+                //.Replace($"\"data\":{{\"notificationId\":{message.NotificationId}}}", "\"data\":{\"msteams\":{\"type\":\"task/fetch\"},\"data\":\"Invoke\"}");
+            //var cardJson = new AdaptiveTextBlock()
+            //{
+            //    Text = notification.Content,
+            //    Wrap = true,
+            //};
+            //card.Body.Add(cardJson);
             var adaptiveCardAttachment = new Attachment()
             {
                 ContentType = AdaptiveCardContentType,
-                Content = JsonConvert.DeserializeObject(notification.Content),
+                //Content = JsonConvert.DeserializeObject(notification.Content),
+                Content = card,
             };
 
             return MessageFactory.Attachment(adaptiveCardAttachment);

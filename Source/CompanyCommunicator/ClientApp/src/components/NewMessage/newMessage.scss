@@ -17,10 +17,9 @@
         position: absolute;
         z-index: -1;
     }*/
-
-    .senderTemplates > .ce {
+    /*.senderTemplates > .ce {
         width: 100% !important;
-    }
+    }*/
 
     .test Drop > ul {
         width: auto;
@@ -44,6 +43,7 @@
 
     .Templates {
         width: 100%;
+        margin-inline-start: -15px;
     }
 
     .formContainer {
@@ -324,7 +324,7 @@
             .formContentContainer {
                 //margin-inline-end: 3.5rem;
                 .ce {
-                    width: 436px;
+                    width: 420px;
                 }
 
                 .inputField {
@@ -445,7 +445,7 @@
 
 
                 .adaptiveCardContainer {
-                    margin: 0 2rem;
+                    //margin: 0 2rem;
                     //width: 436px !important;
                 }
             }

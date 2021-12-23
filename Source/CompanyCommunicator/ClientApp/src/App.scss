@@ -2,6 +2,10 @@
 * Global Styles for APP
 */
 .defaultContainer {
+    .senderTemplates > .ce {
+        width: 100% !important;
+    }
+
     background-color: #f3f2f1;
 
     .configContainer {
@@ -88,12 +92,14 @@
         width: 100%;
         margin: 20rem auto;
     }
+
     .ac-container {
         //border: 0.2rem solid #c8c6c4 !important;
         border-top: 0.2rem solid #6265A9 !important;
         border-radius: 0.3rem;
         padding: 1.6rem !important;
         margin-top: 0.6rem !important;
+        width: 42rem;
     }
     /*.ac-container {
         border-top: 0.2rem solid #6265A9 !important;
@@ -106,7 +112,8 @@
     }*/
 
     .ac-container:not(.ac-adaptiveCard) {
-        margin: -18px -15px 0px !important;
+        margin: -15px -18px 0px !important;
+        //margin: -18px -15px 0px !important;
         //padding: 0.2rem !important;
     }
 
@@ -117,10 +124,30 @@
 }
 
 .darkContainer {
+    .senderTemplates > .ce {
+        width: 100% !important;
+    }
+
     background-color: #201f1f;
 
     .configContainer {
         background-color: #2d2c2c;
+    }
+
+    .testDrop {
+        .hn {
+            width: 100%
+        }
+    }
+
+    .ac-container:not(.ac-adaptiveCard) {
+        margin: -15px -18px 0px !important
+        //padding: 0.2rem !important;
+    }
+
+    .ac-adaptiveCard {
+        border: 0.2rem solid #c8c6c4 !important;
+        //padding: 1.6rem !important;
     }
 
     .ui-dropdown__container {
@@ -220,6 +247,15 @@
     }
 
     .ac-container {
+        //border: 0.2rem solid #c8c6c4 !important;
+        border-top: 0.2rem solid #6265A9 !important;
+        border-radius: 0.3rem;
+        padding: 1.6rem !important;
+        margin-top: 0.6rem !important;
+        background-color: #2D2C2C !important;
+        width: 42rem;
+    }
+    /*.ac-container {
         border: 0.2rem solid #1B1A1A;
         border-top: 0.2rem solid #6265A9;
         border-radius: 0.3rem;
@@ -227,7 +263,7 @@
         padding: 1.6rem !important;
         background-color: #2D2C2C !important;
         margin-top: 0.6rem !important;
-    }
+    }*/
 
     .ac-textBlock {
         color: #fff !important;
@@ -244,6 +280,10 @@
 }
 
 .highContrastContainer {
+    .senderTemplates > .ce {
+        width: 100% !important;
+    }
+
     background-color: #000;
 
     .configContainer {

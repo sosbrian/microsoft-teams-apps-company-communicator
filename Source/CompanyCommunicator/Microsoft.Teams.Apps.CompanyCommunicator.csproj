@@ -98,6 +98,7 @@
     <UserSecretsId>2e464615-9805-4f14-8ecf-e648efd77a99</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     <AssemblyName>Microsoft.Teams.Apps.CompanyCommunicator</AssemblyName>
+    <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
 
 </Project>

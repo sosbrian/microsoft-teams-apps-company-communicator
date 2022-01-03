@@ -75,20 +75,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             var notification = await this.sentNotificationDataRepository.GetAsync(
                 partitionKey: notificationId,
                 rowKey: aadid);
-            //var tempNotification = await this.notificationRepo.GetAsync(
-            //    NotificationDataTableNames.SendingNotificationsPartition,
-            //    notificationId);
-            //var entityNotification = await this.sentNotificationDataRepository.GetAsync(
-            //    NotificationDataTableNames.SentNotificationsPartition,
-            //    notificationId);
             var textNotification = await this.notificationDataRepository.GetAsync(
                 NotificationDataTableNames.SentNotificationsPartition,
                 notificationId);
-            var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true);
-            var test = vCard.ToJson()
-                .Replace("\"version\": \"1.2\",", "\"version\": \"1.0\",")
-                .Replace("\\n", "\\n\\r");
-                //.Replace("\r\n", string.Empty);
+            var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, false);
 
             if ((textNotification.SurReaction == true && notification.ReactionResult == string.Empty)
                 || (textNotification.SurFreeText == true && notification.FreeTextResult == string.Empty)
@@ -97,20 +87,19 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 return this.NoContent();
             }
 
-            //this.Response.Headers.Add("CARD-UPDATE-IN-BODY", "true");
+            if ((textNotification.SurReaction == true && notification.ReactionResult != string.Empty)
+                || (textNotification.SurFreeText == true && notification.FreeTextResult != string.Empty)
+                || (textNotification.SurYesNo == true && notification.YesNoResult != string.Empty))
+            {
+                vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true);
+            }
 
-            // await this.sentNotificationDataRepository.InsertOrMergeAsync(notification);
+            var test = vCard.ToJson()
+                .Replace("\"version\": \"1.2\",", "\"version\": \"1.0\",")
+                .Replace("\\n", "\\n\\r");
 
             this.Response.Headers.Add("CARD-UPDATE-IN-BODY", "true");
             return this.Ok(test);
-        }
-
-        [HttpGet("TeamsResult")]
-        public async Task<IActionResult> PostTeamsSurveyResponse(
-            [FromQuery] string notificationId,
-            [FromQuery] string aadid)
-        {
-            return this.NoContent();
         }
     }
 }

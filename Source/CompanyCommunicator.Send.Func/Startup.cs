@@ -53,6 +53,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         configuration.GetValue<string>("AuthorAppPassword");
                     companyCommunicatorSendFunctionOptions.AppServiceUri =
                         configuration.GetValue<string>("AppServiceUri");
+                    companyCommunicatorSendFunctionOptions.TaskModuleAppID =
+                        configuration.GetValue<string>("TaskModuleAppID");
                 });
             builder.Services.AddOptions<BotOptions>()
                 .Configure<IConfiguration>((botOptions, configuration) =>

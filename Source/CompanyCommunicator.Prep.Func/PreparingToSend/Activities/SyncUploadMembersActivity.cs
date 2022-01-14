@@ -156,6 +156,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
                     {
                         AadId = user.Id,
                         UserType = userType,
+                        Preference = userEntity.Preference,
                     };
                 }
 

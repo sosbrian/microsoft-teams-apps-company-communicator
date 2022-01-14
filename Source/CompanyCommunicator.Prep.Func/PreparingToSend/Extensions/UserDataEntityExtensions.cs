@@ -37,6 +37,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend.Ext
                 UserId = userDataEntity.UserId,
                 ServiceUrl = userDataEntity.ServiceUrl,
                 UserType = userDataEntity.UserType,
+                Preference = userDataEntity.Preference,
             };
         }
     }

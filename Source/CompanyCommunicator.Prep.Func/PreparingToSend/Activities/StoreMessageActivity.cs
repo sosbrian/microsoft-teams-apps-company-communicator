@@ -48,6 +48,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
             }
 
             var serializedContent = this.adaptiveCardCreator.CreateAdaptiveCard(notification).ToJson();
+            var serializedContent2 = this.adaptiveCardCreator.CreateSecAdaptiveCard(notification).ToJson();
 
             var sendingNotification = new SendingNotificationDataEntity
             {
@@ -55,6 +56,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
                 RowKey = notification.RowKey,
                 NotificationId = notification.Id,
                 Content = serializedContent,
+                Content2 = serializedContent2,
             };
 
             await this.sendingNotificationDataRepository.CreateOrUpdateAsync(sendingNotification);

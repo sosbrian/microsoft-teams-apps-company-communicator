@@ -12,6 +12,16 @@
         background-color: #fff;
     }
 
+    .testDrop {
+        //width: 100%;
+        border-radius: 0px;
+        display: block;
+
+        .ui-dropdown__container {
+            width: 100%;
+        }
+    }
+
     .list {
         .succeeded {
             color: #237B4B;
@@ -134,11 +144,22 @@
         background-color: #2d2c2c;
     }
 
-    .testDrop {
-        .hn {
-            width: 100%
+    .taskModule {
+        .testDrop {
+            //width: 100%;
+            border-radius: 0px;
+            display: block;
+
+            .ui-dropdown__container {
+                width: auto;
+
+                .ui-dropdown__selected-items {
+                    width: auto;
+                }
+            }
         }
     }
+
 
     .ac-container:not(.ac-adaptiveCard) {
         margin: -15px -18px 0px !important

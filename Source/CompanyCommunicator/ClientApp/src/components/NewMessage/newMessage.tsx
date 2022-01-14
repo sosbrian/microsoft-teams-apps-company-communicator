@@ -43,7 +43,10 @@ type dropdownItem = {
 
 export interface IDraftMessage {
     template?: string,
+    priLanguage: string,
+    secLanguage: string,
     senderTemplate: string,
+    secSenderTemplate: string,
     id?: string,
     title: string,
     imageLink?: string,
@@ -73,6 +76,34 @@ export interface IDraftMessage {
     yesNoQuestion?: string,
     surLinkToSurvey?: boolean,
     linkToSurvey?: string,
+    secTitle: string,
+    secImageLink?: string,
+    secVideoLink?: string,
+    secAlignment?: string,
+    secSummary?: string,
+    secBoldSummary?: string,
+    secFontSummary?: string,
+    secFontSizeSummary?: string,
+    secFontColorSummary?: string,
+    secAuthor: string,
+    secButtonTitle?: string,
+    secButtonLink?: string,
+    secButtonTitle2?: string,
+    secButtonLink2?: string,
+    secButtonTitle3?: string,
+    secButtonLink3?: string,
+    secButtonTitle4?: string,
+    secButtonLink4?: string,
+    secButtonTitle5?: string,
+    secButtonLink5?: string,
+    secSurReaction?: boolean,
+    secReactionQuestion?: string,
+    secSurFreeText?: boolean,
+    secFreeTextQuestion?: string,
+    secSurYesNo?: boolean,
+    secYesNoQuestion?: string,
+    secSurLinkToSurvey?: boolean,
+    secLinkToSurvey?: string,
     teams: any[],
     rosters: any[],
     groups: any[],
@@ -86,6 +117,7 @@ export interface IDraftMessage {
 export interface formState {
     template: string,
     senderTemplate: string,
+    secSenderTemplate: string,
     title: string,
     summary?: string,
     boldSummary?: string,
@@ -114,8 +146,39 @@ export interface formState {
     surLinkToSurvey?: boolean,
     linkToSurvey?: string,
     author: string,
+    secTitle: string,
+    secImageLink?: string,
+    secVideoLink?: string,
+    secAlignment?: string,
+    secSummary?: string,
+    secBoldSummary?: string,
+    secFontSummary?: string,
+    secFontSizeSummary?: string,
+    secFontColorSummary?: string,
+    secAuthor: string,
+    secbtnTitle?: string,
+    secbtnLink?: string,
+    secbtnTitle2?: string,
+    secbtnLink2?: string,
+    secbtnTitle3?: string,
+    secbtnLink3?: string,
+    secbtnTitle4?: string,
+    secbtnLink4?: string,
+    secbtnTitle5?: string,
+    secbtnLink5?: string,
+    secSurReaction?: boolean,
+    secReactionQuestion?: string,
+    secSurFreeText?: boolean,
+    secFreeTextQuestion?: string,
+    secSurYesNo?: boolean,
+    secYesNoQuestion?: string,
+    secSurLinkToSurvey?: boolean,
+    secLinkToSurvey?: string,
     card?: any,
     page: string,
+    language: string,
+    priLanguage: string,
+    secLanguage: string,
     teamsOptionSelected: boolean,
     rostersOptionSelected: boolean,
     allUsersOptionSelected: boolean,
@@ -370,6 +433,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.state = {
             template: "",
             senderTemplate: "",
+            secSenderTemplate: "",
             title: "",
             summary: "",
             alignment: "left",
@@ -398,8 +462,39 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             yesNoQuestion: "",
             surLinkToSurvey: false,
             linkToSurvey: "",
+            secTitle: "",
+            secImageLink: "",
+            secVideoLink: "",
+            secAlignment: "left",
+            secSummary: "",
+            secBoldSummary: "",
+            secFontSummary: "",
+            secFontSizeSummary: "",
+            secFontColorSummary: "",
+            secAuthor: "",
+            secbtnTitle: "",
+            secbtnLink: "",
+            secbtnTitle2: "",
+            secbtnLink2: "",
+            secbtnTitle3: "",
+            secbtnLink3: "",
+            secbtnTitle4: "",
+            secbtnLink4: "",
+            secbtnTitle5: "",
+            secbtnLink5: "",
+            secSurReaction: false,
+            secReactionQuestion: "",
+            secSurFreeText: false,
+            secFreeTextQuestion: "",
+            secSurYesNo: false,
+            secYesNoQuestion: "",
+            secSurLinkToSurvey: false,
+            secLinkToSurvey: "",
             card: this.card,
             page: "TemplateSelection",
+            language: "Primary",
+            priLanguage: "English",
+            secLanguage: "",
             teamsOptionSelected: true,
             rostersOptionSelected: false,
             allUsersOptionSelected: false,
@@ -436,6 +531,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         }
         this.fileInput = React.createRef();
         this.handleImageSelection = this.handleImageSelection.bind(this);
+        this.handleSecImageSelection = this.handleSecImageSelection.bind(this);
     }
 
     public async componentDidMount() {
@@ -481,12 +577,117 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         });
     }
 
+    //function to handle the secondary language layout
+    private switchLanguage = (event: any, itemsData: any) => {
+        //console.log(event)
+        if (itemsData.value === "Primary") {
+            this.setState({
+                language: "Primary"
+            }, () => {
+                console.log("Language: " + this.state.language);
+            });
+        } else if (itemsData.value === "Secondary") {
+            this.setState({
+                language: "Secondary"
+            }, () => {
+                console.log("Language: " + this.state.language);
+            });
+        }
+    }
+
+    //function to handle the secondary language layout
+    private selectLanguage = (event: any, itemsData: any) => {
+        if(this.state.language === "Primary"){
+            if (itemsData.value === "English") {
+                this.setState({
+                    priLanguage: "English"
+                });
+            } else if (itemsData.value === "Burmese") {
+                this.setState({
+                    priLanguage: "Burmese"
+                });
+            } else if (itemsData.value === "Traditional Chinese") {
+                this.setState({
+                    priLanguage: "Traditional Chinese"
+                });
+            } else if (itemsData.value === "Simplified Chinese") {
+                this.setState({
+                    priLanguage: "Simplified Chinese"
+                });
+            } else if (itemsData.value === "Malay") {
+                this.setState({
+                    priLanguage: "Malay"
+                });
+            } else if (itemsData.value === "Thai") {
+                this.setState({
+                    priLanguage: "Thai"
+                });
+            } else if (itemsData.value === "Filipino") {
+                this.setState({
+                    priLanguage: "Filipino"
+                });
+            } else if (itemsData.value === "Indonesian") {
+                this.setState({
+                    priLanguage: "Indonesian"
+                });
+            } else if (itemsData.value === "Korea") {
+                this.setState({
+                    priLanguage: "Korea"
+                });
+            } else if (itemsData.value === "Vietnamese") {
+                this.setState({
+                    priLanguage: "Vietnamese"
+                });
+            }
+        } else if (this.state.language === "Secondary") {
+            if (itemsData.value === "English") {
+                this.setState({
+                    secLanguage: "English"
+                });
+            } else if (itemsData.value === "Burmese") {
+                this.setState({
+                    secLanguage: "Burmese"
+                });
+            } else if (itemsData.value === "Traditional Chinese") {
+                this.setState({
+                    secLanguage: "Traditional Chinese"
+                });
+            } else if (itemsData.value === "Simplified Chinese") {
+                this.setState({
+                    secLanguage: "Simplified Chinese"
+                });
+            } else if (itemsData.value === "Malay") {
+                this.setState({
+                    secLanguage: "Malay"
+                });
+            } else if (itemsData.value === "Thai") {
+                this.setState({
+                    secLanguage: "Thai"
+                });
+            } else if (itemsData.value === "Filipino") {
+                this.setState({
+                    secLanguage: "Filipino"
+                });
+            } else if (itemsData.value === "Indonesian") {
+                this.setState({
+                    secLanguage: "Indonesian"
+                });
+            } else if (itemsData.value === "Korea") {
+                this.setState({
+                    secLanguage: "Korea"
+                });
+            } else if (itemsData.value === "Vietnamese") {
+                this.setState({
+                    secLanguage: "Vietnamese"
+                });
+            }
+        }
+    }
+
     //function to handle the selection of the OS file upload box
     private handleImageSelection() {
         //get the first file selected
-        console.log("before")
         const file = this.fileInput.current.files[0];
-        console.log("after")
         if (file) { //if we have a file
             //resize the image to fit in the adaptivecard
             var cardsize = JSON.stringify(this.card).length;
@@ -522,6 +723,47 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setState({
             errorImageUrlMessage: "",
             imageLink: ""
+        });
+        //fire the fileinput click event and run the handleimageselection function
+        this.fileInput.current.click();
+    };
+
+    //function to handle the selection of the OS file upload box
+    private handleSecImageSelection() {
+        //get the first file selected
+        const file = this.fileInput.current.files[0];
+        if (file) { //if we have a file
+            //resize the image to fit in the adaptivecard
+            var cardsize = JSON.stringify(this.card).length;
+            Resizer.imageFileResizer(file, 400, 400, 'JPEG', 80, 0,
+                uri => {
+                    if (uri.toString().length < 30720) {
+                        //lets set the state with the image value
+                        this.setState({
+                            secImageLink: uri.toString()
+                        }
+                        );
+                        console.log(this.state.secImageLink)
+                    } else {
+                        var errormsg = this.localize("ErrorImageTooBig") + " " + this.localize("ErrorImageTooBigSize") + " " + (30720 - cardsize) + " bytes.";
+                        //images bigger than 32K cannot be saved, set the error message to be presented
+                        this.setState({
+                            errorImageUrlMessage: errormsg
+                        });
+                        console.log(this.state.secImageLink)
+                    }
+
+                },
+                'base64'); //we need the image in base64
+        }
+    }
+
+    //Function calling a click event on a hidden file input
+    private handleSecUploadClick = (event: any) => {
+        //reset the error message and the image link as the upload will reset them potentially
+        this.setState({
+            errorImageUrlMessage: "",
+            secImageLink: ""
         });
         //fire the fileinput click event and run the handleimageselection function
         this.fileInput.current.click();
@@ -1234,6 +1476,11 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         }
     }
 
+    private printCon = (e: any) => {
+        console.log("Pri: " + this.state.priLanguage)
+        console.log("Sec: " + this.state.secLanguage)
+    }
+
     private getGroupItems() {
         if (this.state.groups) {
             return this.makeDropdownItems(this.state.groups);
@@ -1339,6 +1586,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
             this.setState({
                 page: "CardCreation",
+                priLanguage: draftMessageDetail.priLanguage,
+                secLanguage: draftMessageDetail.secLanguage,
                 template: draftMessageDetail.template,
                 senderTemplate: draftMessageDetail.senderTemplate,
                 title: draftMessageDetail.title,
@@ -1369,6 +1618,35 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 surLinkToSurvey: draftMessageDetail.surLinkToSurvey,
                 linkToSurvey: draftMessageDetail.linkToSurvey,
                 author: draftMessageDetail.author,
+                secSenderTemplate: draftMessageDetail.secSenderTemplate,
+                secTitle: draftMessageDetail.secTitle,
+                secSummary: draftMessageDetail.secSummary,
+                secAlignment: draftMessageDetail.secAlignment,
+                secFontSummary: draftMessageDetail.secFontSummary,
+                secFontSizeSummary: draftMessageDetail.secFontSizeSummary,
+                secFontColorSummary: draftMessageDetail.secFontColorSummary,
+                secBoldSummary: draftMessageDetail.secBoldSummary,
+                secbtnLink: draftMessageDetail.secButtonLink,
+                secImageLink: draftMessageDetail.secImageLink,
+                secVideoLink: draftMessageDetail.secVideoLink,
+                secbtnTitle: draftMessageDetail.secButtonTitle,
+                secbtnTitle2: draftMessageDetail.secButtonTitle2,
+                secbtnTitle3: draftMessageDetail.secButtonTitle3,
+                secbtnTitle4: draftMessageDetail.secButtonTitle4,
+                secbtnTitle5: draftMessageDetail.secButtonTitle5,
+                secbtnLink2: draftMessageDetail.secButtonLink2,
+                secbtnLink3: draftMessageDetail.secButtonLink3,
+                secbtnLink4: draftMessageDetail.secButtonLink4,
+                secbtnLink5: draftMessageDetail.secButtonLink5,
+                secSurReaction: draftMessageDetail.secSurReaction,
+                secReactionQuestion: draftMessageDetail.secReactionQuestion,
+                secSurFreeText: draftMessageDetail.secSurFreeText,
+                secFreeTextQuestion: draftMessageDetail.secFreeTextQuestion,
+                secSurYesNo: draftMessageDetail.secSurYesNo,
+                secYesNoQuestion: draftMessageDetail.secYesNoQuestion,
+                secSurLinkToSurvey: draftMessageDetail.secSurLinkToSurvey,
+                secLinkToSurvey: draftMessageDetail.secLinkToSurvey,
+                secAuthor: draftMessageDetail.secAuthor,
                 allUsersOptionSelected: draftMessageDetail.allUsers,
                 loader: false
             }, () => {
@@ -1402,6 +1680,28 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 key: "4", header: "Event promotion with sessions to register/join"
             }
         ];
+        // const language = [
+        //     {
+        //         key: "eng", header: "English"
+        //     }, {
+        //         key: "bur", header: "Burmese"
+        //     }, {
+        //         key: "cht", header: "Traditional Chinese"
+        //     }, {
+        //         key: "chs", header: "Simplified Chinese"
+        //     }, {
+        //         key: "may", header: "Malay"
+        //     }, {
+        //         key: "fil", header: "Filipino"
+        //     }, {
+        //         key: "ind", header: "Indonesian"
+        //     }, {
+        //         key: "kor", header: "Korea"
+        //     }, {
+        //         key: "vie", header: "Vietnamese"
+        //     }
+        // ];
+        const language = ["English", "Burmese", "Traditional Chinese", "Simplified Chinese", "Malay", "Filipino", "Indonesian", "Korea", "Vietnamese"];
         const FontSize = ["Default", "Small", "Medium", "Large", "ExtraLarge" ];
         const Color = ["Default", "Dark", "Light", "Accent", "Good", "Warning", "Attention"];
 
@@ -1452,911 +1752,2021 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                     );
                 } else if (this.state.page === "CardCreation") {
                     if (this.state.template === "Announcements with image") {
-                        return (
-                            <div className="taskModule">
-                                <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
-                                    <Flex className="scrollableContent">
-                                        <Flex.Item size="size.half">
-                                            <Flex column className="formContentContainer">
-                                                <Input className="senderTemplates"
-                                                    value={this.state.senderTemplate}
-                                                    label={this.localize("Header")}
-                                                    placeholder={this.localize("HEADER")}
-                                                    onChange={this.onSenderTemplateChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    value={this.state.title}
-                                                    label={this.localize("TitleText")}
-                                                    placeholder={this.localize("PlaceHolderTitle")}
-                                                    onChange={this.onTitleChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Flex gap="gap.smaller" vAlign="end" className="inputField">
-                                                    <Input fluid className="inputField"
-                                                        value={this.state.imageLink}
-                                                        label={this.localize("ImageURL")}
-                                                        placeholder={this.localize("ImageURL")}
-                                                        onChange={this.onImageLinkChanged}
-                                                        error={!(this.state.errorImageUrlMessage === "")}
+                        if (this.state.language === "Primary") {
+                            return (
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    {/*<Dropdown*/}
+                                                    {/*    value={this.state.language}*/}
+                                                    {/*    items={language}*/}
+                                                    {/*    onChange={this.switchLanguage}*/}
+                                                    {/*    checkable*/}
+                                                    {/*/>*/}
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
+                                                        />
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
+                                                        />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.priLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.senderTemplate}
+                                                        label={this.localize("Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.title}
+                                                        label={this.localize("TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.imageLink}
+                                                            label={this.localize("ImageURL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.boldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <ToggleButtonGroup size="small" value={this.state.fontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onFontSizeChange}
+                                                                value={this.state.fontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onFontColorChange}
+                                                                value={this.state.fontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.summary}
+                                                            onChange={this.onSummaryChanged}
+                                                            fluid />
+                                                    </div>
+
+                                                    <Input className="inputField"
+                                                        value={this.state.author}
+                                                        label={this.localize("Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle}
+                                                        label={this.localize("ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onBtnTitleChanged}
                                                         autoComplete="off"
                                                     />
-                                                    <input type="file" accept="image/"
-                                                        style={{ display: 'none' }}
-                                                        onChange={this.handleImageSelection}
-                                                        ref={this.fileInput} />
-                                                    <Flex.Item push>
-                                                        <Button circular onClick={this.handleUploadClick}
-                                                            size="small"
-                                                            icon={<FilesUploadIcon />}
-                                                            title="UploadImage"
-                                                        />
-                                                    </Flex.Item>
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink}
+                                                        label={this.localize("ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surReaction}
+                                                                onChange={this.onReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onReactionQuestionChanged}
+                                                        value={this.state.reactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surFreeText}
+                                                                onChange={this.onFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onFreeTextQuestionChanged}
+                                                        value={this.state.freeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surYesNo}
+                                                                onChange={this.onYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onYesNoQuestionChanged}
+                                                        value={this.state.yesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surLinkToSurvey}
+                                                                onChange={this.onToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onLinktoSurveyChanged}
+                                                        value={this.state.linkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
                                                 </Flex>
-                                                <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
-                                                <div className="textArea">
-                                                    <Text content={this.localize("Summary")} />
-                                                    <Flex vAlign="center" hAlign="start">
-                                                        <ToggleButtonGroup size="small" value={this.state.boldSummary}>
-                                                            <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
-                                                                <FormatBoldIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <ToggleButtonGroup size="small" value={this.state.fontSummary} >
-                                                            <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
-                                                                <FontDownloadIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <Dropdown className="testDrop"
-                                                            items={FontSize}
-                                                            placeholder="FontSize"
-                                                            onChange={this.onFontSizeChange}
+                                            </Flex.Item>
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
+                                        </Flex>
+
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        } else if (this.state.language === "Secondary") {
+                            return (
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    {/*<Dropdown*/}
+                                                    {/*    value={this.state.language}*/}
+                                                    {/*    items={language}*/}
+                                                    {/*    onChange={this.switchLanguage}*/}
+                                                    {/*    checkable*/}
+                                                    {/*/>*/}
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
                                                         />
-                                                        <Dropdown className="testDrop"
-                                                            items={Color}
-                                                            placeholder="Color"
-                                                            onChange={this.onFontColorChange}
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
                                                         />
-                                                        <Grid item>
-                                                            <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
-                                                                <ToggleButton value="left">
-                                                                    <FormatAlignLeftIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="center">
-                                                                    <FormatAlignCenterIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="right">
-                                                                    <FormatAlignRightIcon />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.secLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.secSenderTemplate}
+                                                        label={this.localize("Secondary Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSecSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.secTitle}
+                                                        label={this.localize("Secondary Title")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onSecTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.secImageLink}
+                                                            label={this.localize("Secondary Image URL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onSecImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleSecImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleSecUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Secondary Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.secBoldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onSecBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
                                                                 </ToggleButton>
                                                             </ToggleButtonGroup>
-                                                        </Grid>
-                                                    </Flex>
-                                                    <TextArea
-                                                        autoFocus
-                                                        placeholder={this.localize("Summary")}
-                                                        value={this.state.summary}
-                                                        onChange={this.onSummaryChanged}
-                                                        fluid />
-                                                </div>
+                                                            <ToggleButtonGroup size="small" value={this.state.secFontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onSecFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onSecFontSizeChange}
+                                                                value={this.state.secFontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onSecFontColorChange}
+                                                                value={this.state.secFontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.secAlignment} size="small" onChange={this.onSecAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.secSummary}
+                                                            onChange={this.onSecSummaryChanged}
+                                                            fluid />
+                                                    </div>
 
-                                                <Input className="inputField"
-                                                    value={this.state.author}
-                                                    label={this.localize("Author")}
-                                                    placeholder={this.localize("Author")}
-                                                    onChange={this.onAuthorChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle}
-                                                    label={this.localize("ButtonTitle")}
-                                                    placeholder={this.localize("ButtonTitle")}
-                                                    onChange={this.onBtnTitleChanged}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink}
-                                                    label={this.localize("ButtonURL")}
-                                                    placeholder={this.localize("ButtonURL")}
-                                                    onChange={this.onBtnLinkChanged}
-                                                    error={!(this.state.errorButtonUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
-                                                
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surReaction}
-                                                            onChange={this.onReactionChanged}
-                                                        />
-                                                    }
-                                                    label="Reaction"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for reaction")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onReactionQuestionChanged}
-                                                    value={this.state.reactionQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surFreeText}
-                                                            onChange={this.onFreeTextChanged}
-                                                        />
-                                                    }
-                                                    label="Free Text"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for for free text")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onFreeTextQuestionChanged}
-                                                    value={this.state.freeTextQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surYesNo}
-                                                            onChange={this.onYesNoChanged}
-                                                        />
-                                                    }
-                                                    label="Yes/ No Question"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for Yes / No")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onYesNoQuestionChanged}
-                                                    value={this.state.yesNoQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surLinkToSurvey}
-                                                            onChange={this.onToggleLinktoSurveyChanged}
-                                                        />
-                                                    }
-                                                    label="Link to Survey"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Survey URL")}
-                                                    placeholder={this.localize("Enter URL")}
-                                                    onChange={this.onLinktoSurveyChanged}
-                                                    value={this.state.linkToSurvey}
-                                                    error={!(this.state.errorLinkToSurveyUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
-                                            </Flex>
-                                        </Flex.Item>
-                                        <Flex.Item size="size.half">
-                                            <div className="adaptiveCardContainer">
-                                            </div>
-                                        </Flex.Item>
-                                    </Flex>
+                                                    <Input className="inputField"
+                                                        value={this.state.secAuthor}
+                                                        label={this.localize("Secondary Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onSecAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle}
+                                                        label={this.localize("Secondary Button Title")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onSecBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink}
+                                                        label={this.localize("Secondary Button URL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onSecBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
 
-                                    <Flex className="footerContainer" vAlign="end" hAlign="end">
-                                        <Flex className="buttonContainer">
-                                            <Flex.Item push>
-                                                <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurReaction}
+                                                                onChange={this.onSecReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecReactionQuestionChanged}
+                                                        value={this.state.secReactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurFreeText}
+                                                                onChange={this.onSecFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecFreeTextQuestionChanged}
+                                                        value={this.state.secFreeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurYesNo}
+                                                                onChange={this.onSecYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecYesNoQuestionChanged}
+                                                        value={this.state.secYesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurLinkToSurvey}
+                                                                onChange={this.onSecToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onSecLinktoSurveyChanged}
+                                                        value={this.state.secLinkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
                                             </Flex.Item>
-                                            <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
                                         </Flex>
-                                    </Flex>
 
-                                </Flex>
-                            </div>
-                        );
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        }
                     } else if (this.state.template === "Announcement with video") {
-                        return (
-                            <div className="taskModule">
-                                <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
-                                    <Flex className="scrollableContent">
-                                        <Flex.Item size="size.half">
-                                            <Flex column className="formContentContainer">
-                                                {/*<Dropdown*/}
-                                                {/*    className="senderTemplates"*/}
-                                                {/*    placeholder="Choose a Sender Template"*/}
-                                                {/*    value={this.state.senderTemplate}*/}
-                                                {/*    items={senderTemplates}*/}
-                                                {/*    checkable*/}
-                                                {/*    onChange={this.onSenderTemplateChanged}*/}
-                                                {/*/>*/}
-                                                <Input className="senderTemplates"
-                                                    value={this.state.senderTemplate}
-                                                    label={this.localize("Header")}
-                                                    placeholder={this.localize("HEADER")}
-                                                    onChange={this.onSenderTemplateChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    value={this.state.title}
-                                                    label={this.localize("TitleText")}
-                                                    placeholder={this.localize("PlaceHolderTitle")}
-                                                    onChange={this.onTitleChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input fluid className="inputField"
-                                                    value={this.state.imageLink}
-                                                    label={this.localize("ImageURL")}
-                                                    placeholder={this.localize("ImageURL")}
-                                                    onChange={this.onImageLinkChanged}
-                                                    error={!(this.state.errorImageUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+                        if (this.state.language === "Primary") { 
+                            return(
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
+                                                        />
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
+                                                        />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.priLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop"
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.senderTemplate}
+                                                        label={this.localize("Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.title}
+                                                        label={this.localize("TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.imageLink}
+                                                            label={this.localize("ImageURL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
 
-                                                <div className="textArea">
-                                                    <Text content={this.localize("Summary")} />
-                                                    <Flex vAlign="center" hAlign="start">
-                                                        <ToggleButtonGroup size="small" value={this.state.boldSummary}>
-                                                            <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
-                                                                <FormatBoldIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <ToggleButtonGroup size="small" value={this.state.fontSummary} >
-                                                            <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
-                                                                <FontDownloadIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <Dropdown className="testDrop"
-                                                            items={FontSize}
-                                                            placeholder="FontSize"
-                                                            onChange={this.onFontSizeChange}
-                                                        />
-                                                        <Dropdown className="testDrop"
-                                                            items={Color}
-                                                            placeholder="Color"
-                                                            onChange={this.onFontColorChange}
-                                                        />
-                                                        <Grid item>
-                                                            <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
-                                                                <ToggleButton value="left">
-                                                                    <FormatAlignLeftIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="center">
-                                                                    <FormatAlignCenterIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="right">
-                                                                    <FormatAlignRightIcon />
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.boldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
                                                                 </ToggleButton>
                                                             </ToggleButtonGroup>
-                                                        </Grid>
-                                                    </Flex>
-                                                    <TextArea
-                                                        autoFocus
-                                                        placeholder={this.localize("Summary")}
-                                                        value={this.state.summary}
-                                                        onChange={this.onSummaryChanged}
-                                                        fluid />
-                                                </div>
+                                                            <ToggleButtonGroup size="small" value={this.state.fontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onFontSizeChange}
+                                                                value={this.state.fontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onFontColorChange}
+                                                                value={this.state.fontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.summary}
+                                                            onChange={this.onSummaryChanged}
+                                                            fluid />
+                                                    </div>
 
-                                                <Input className="inputField"
-                                                    value={this.state.author}
-                                                    label={this.localize("Author")}
-                                                    placeholder={this.localize("Author")}
-                                                    onChange={this.onAuthorChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input fluid className="inputField"
-                                                    value={this.state.videoLink}
-                                                    label={this.localize("Video URL")}
-                                                    placeholder={this.localize("Video URL")}
-                                                    onChange={this.onVideoLinkChanged}
-                                                    error={!(this.state.errorVideoUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle}
-                                                    label={this.localize("ButtonTitle")}
-                                                    placeholder={this.localize("ButtonTitle")}
-                                                    onChange={this.onBtnTitleChanged}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink}
-                                                    label={this.localize("ButtonURL")}
-                                                    placeholder={this.localize("ButtonURL")}
-                                                    onChange={this.onBtnLinkChanged}
-                                                    error={!(this.state.errorButtonUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surReaction}
-                                                            onChange={this.onReactionChanged}
-                                                        />
-                                                    }
-                                                    label="Reaction"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for reaction")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onReactionQuestionChanged}
-                                                    value={this.state.reactionQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surFreeText}
-                                                            onChange={this.onFreeTextChanged}
-                                                        />
-                                                    }
-                                                    label="Free Text"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for for free text")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onFreeTextQuestionChanged}
-                                                    value={this.state.freeTextQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surYesNo}
-                                                            onChange={this.onYesNoChanged}
-                                                        />
-                                                    }
-                                                    label="Yes/ No Question"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for Yes / No")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onYesNoQuestionChanged}
-                                                    value={this.state.yesNoQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surLinkToSurvey}
-                                                            onChange={this.onToggleLinktoSurveyChanged}
-                                                        />
-                                                    }
-                                                    label="Link to Survey"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Survey URL")}
-                                                    placeholder={this.localize("Enter URL")}
-                                                    onChange={this.onLinktoSurveyChanged}
-                                                    value={this.state.linkToSurvey}
-                                                    error={!(this.state.errorLinkToSurveyUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
-                                            </Flex>
-                                        </Flex.Item>
-                                        <Flex.Item size="size.half">
-                                            <div className="adaptiveCardContainer">
-                                            </div>
-                                        </Flex.Item>
-                                    </Flex>
-
-                                    <Flex className="footerContainer" vAlign="end" hAlign="end">
-                                        <Flex className="buttonContainer">
-                                            <Flex.Item push>
-                                                <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                    <Input className="inputField"
+                                                        value={this.state.author}
+                                                        label={this.localize("Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input fluid className="inputField"
+                                                        value={this.state.videoLink}
+                                                        label={this.localize("Video URL")}
+                                                        placeholder={this.localize("Video URL")}
+                                                        onChange={this.onVideoLinkChanged}
+                                                        error={!(this.state.errorVideoUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle}
+                                                        label={this.localize("ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink}
+                                                        label={this.localize("ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surReaction}
+                                                                onChange={this.onReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onReactionQuestionChanged}
+                                                        value={this.state.reactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surFreeText}
+                                                                onChange={this.onFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onFreeTextQuestionChanged}
+                                                        value={this.state.freeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surYesNo}
+                                                                onChange={this.onYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onYesNoQuestionChanged}
+                                                        value={this.state.yesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surLinkToSurvey}
+                                                                onChange={this.onToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onLinktoSurveyChanged}
+                                                        value={this.state.linkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
                                             </Flex.Item>
-                                            <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
                                         </Flex>
-                                    </Flex>
 
-                                </Flex>
-                            </div>
-                        );
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        } else if (this.state.language === "Secondary") {
+                            return(
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
+                                                        />
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
+                                                        />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.secLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop"
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.secSenderTemplate}
+                                                        label={this.localize("Secondary Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSecSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.secTitle}
+                                                        label={this.localize("Secondary TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onSecTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.secImageLink}
+                                                            label={this.localize("Secondary ImageURL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onSecImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleSecImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleSecUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Secondary Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.secBoldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onSecBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <ToggleButtonGroup size="small" value={this.state.secFontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onSecFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onSecFontSizeChange}
+                                                                value={this.state.secFontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onSecFontColorChange}
+                                                                value={this.state.secFontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.secAlignment} size="small" onChange={this.onSecAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.secSummary}
+                                                            onChange={this.onSecSummaryChanged}
+                                                            fluid />
+                                                    </div>
+
+                                                    <Input className="inputField"
+                                                        value={this.state.secAuthor}
+                                                        label={this.localize("Secondary Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onSecAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input fluid className="inputField"
+                                                        value={this.state.secVideoLink}
+                                                        label={this.localize("Secondary Video URL")}
+                                                        placeholder={this.localize("Video URL")}
+                                                        onChange={this.onSecVideoLinkChanged}
+                                                        error={!(this.state.errorVideoUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle}
+                                                        label={this.localize("Secondary ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onSecBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink}
+                                                        label={this.localize("Secondary ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onSecBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurReaction}
+                                                                onChange={this.onSecReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecReactionQuestionChanged}
+                                                        value={this.state.secReactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurFreeText}
+                                                                onChange={this.onSecFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecFreeTextQuestionChanged}
+                                                        value={this.state.secFreeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurYesNo}
+                                                                onChange={this.onSecYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecYesNoQuestionChanged}
+                                                        value={this.state.secYesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurLinkToSurvey}
+                                                                onChange={this.onSecToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onSecLinktoSurveyChanged}
+                                                        value={this.state.secLinkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
+                                            </Flex.Item>
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
+                                        </Flex>
+
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        }
                     } else if (this.state.template === "Announcement in plain text") {
-                        return (
-                            <div className="taskModule">
-                                <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
-                                    <Flex className="scrollableContent">
-                                        <Flex.Item size="size.half">
-                                            <Flex column className="formContentContainer">
-                                                {/*<Dropdown*/}
-                                                {/*    className="senderTemplates"*/}
-                                                {/*    placeholder="Choose a Sender Template"*/}
-                                                {/*    value={this.state.senderTemplate}*/}
-                                                {/*    items={senderTemplates}*/}
-                                                {/*    checkable*/}
-                                                {/*    onChange={this.onSenderTemplateChanged}*/}
-                                                {/*/>*/}
-                                                <Input className="senderTemplates"
-                                                    value={this.state.senderTemplate}
-                                                    label={this.localize("Header")}
-                                                    placeholder={this.localize("HEADER")}
-                                                    onChange={this.onSenderTemplateChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    value={this.state.title}
-                                                    label={this.localize("TitleText")}
-                                                    placeholder={this.localize("PlaceHolderTitle")}
-                                                    onChange={this.onTitleChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
-
-                                                <div className="textArea">
-                                                    <Text content={this.localize("Summary")} />
-                                                    <Flex vAlign="center" hAlign="start">
-                                                        <ToggleButtonGroup size="small" value={this.state.boldSummary}>
-                                                            <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
-                                                                <FormatBoldIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <ToggleButtonGroup size="small" value={this.state.fontSummary} >
-                                                            <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
-                                                                <FontDownloadIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <Dropdown className="testDrop"
-                                                            items={FontSize}
-                                                            placeholder="FontSize"
-                                                            onChange={this.onFontSizeChange}
+                        if (this.state.language === "Primary") {
+                            return(
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
                                                         />
-                                                        <Dropdown className="testDrop"
-                                                            items={Color}
-                                                            placeholder="Color"
-                                                            onChange={this.onFontColorChange}
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
                                                         />
-                                                        <Grid item>
-                                                            <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
-                                                                <ToggleButton value="left">
-                                                                    <FormatAlignLeftIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="center">
-                                                                    <FormatAlignCenterIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="right">
-                                                                    <FormatAlignRightIcon />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.priLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.senderTemplate}
+                                                        label={this.localize("Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.title}
+                                                        label={this.localize("TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.boldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
                                                                 </ToggleButton>
                                                             </ToggleButtonGroup>
-                                                        </Grid>
-                                                    </Flex>
-                                                    <TextArea
-                                                        autoFocus
-                                                        placeholder={this.localize("Summary")}
-                                                        value={this.state.summary}
-                                                        onChange={this.onSummaryChanged}
-                                                        fluid />
-                                                </div>
+                                                            <ToggleButtonGroup size="small" value={this.state.fontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onFontSizeChange}
+                                                                value={this.state.fontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onFontColorChange}
+                                                                value={this.state.fontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.summary}
+                                                            onChange={this.onSummaryChanged}
+                                                            fluid />
+                                                    </div>
 
-                                                <Input className="inputField"
-                                                    value={this.state.author}
-                                                    label={this.localize("Author")}
-                                                    placeholder={this.localize("Author")}
-                                                    onChange={this.onAuthorChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle}
-                                                    label={this.localize("ButtonTitle")}
-                                                    placeholder={this.localize("ButtonTitle")}
-                                                    onChange={this.onBtnTitleChanged}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink}
-                                                    label={this.localize("ButtonURL")}
-                                                    placeholder={this.localize("ButtonURL")}
-                                                    onChange={this.onBtnLinkChanged}
-                                                    error={!(this.state.errorButtonUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surReaction}
-                                                            onChange={this.onReactionChanged}
-                                                        />
-                                                    }
-                                                    label="Reaction"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for reaction")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onReactionQuestionChanged}
-                                                    value={this.state.reactionQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surFreeText}
-                                                            onChange={this.onFreeTextChanged}
-                                                        />
-                                                    }
-                                                    label="Free Text"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for for free text")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onFreeTextQuestionChanged}
-                                                    value={this.state.freeTextQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surYesNo}
-                                                            onChange={this.onYesNoChanged}
-                                                        />
-                                                    }
-                                                    label="Yes/ No Question"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for Yes / No")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onYesNoQuestionChanged}
-                                                    value={this.state.yesNoQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surLinkToSurvey}
-                                                            onChange={this.onToggleLinktoSurveyChanged}
-                                                        />
-                                                    }
-                                                    label="Link to Survey"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Survey URL")}
-                                                    placeholder={this.localize("Enter URL")}
-                                                    onChange={this.onLinktoSurveyChanged}
-                                                    value={this.state.linkToSurvey}
-                                                    error={!(this.state.errorLinkToSurveyUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
-                                            </Flex>
-                                        </Flex.Item>
-                                        <Flex.Item size="size.half">
-                                            <div className="adaptiveCardContainer">
-                                            </div>
-                                        </Flex.Item>
-                                    </Flex>
-
-                                    <Flex className="footerContainer" vAlign="end" hAlign="end">
-                                        <Flex className="buttonContainer">
-                                            <Flex.Item push>
-                                                <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                    <Input className="inputField"
+                                                        value={this.state.author}
+                                                        label={this.localize("Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle}
+                                                        label={this.localize("ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink}
+                                                        label={this.localize("ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surReaction}
+                                                                onChange={this.onReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onReactionQuestionChanged}
+                                                        value={this.state.reactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surFreeText}
+                                                                onChange={this.onFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onFreeTextQuestionChanged}
+                                                        value={this.state.freeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surYesNo}
+                                                                onChange={this.onYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onYesNoQuestionChanged}
+                                                        value={this.state.yesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surLinkToSurvey}
+                                                                onChange={this.onToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onLinktoSurveyChanged}
+                                                        value={this.state.linkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
                                             </Flex.Item>
-                                            <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
                                         </Flex>
-                                    </Flex>
 
-                                </Flex>
-                            </div>
-                        );
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        } else if (this.state.language === "Secondary") {
+                            return(
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
+                                                        />
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
+                                                        />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.secLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.secSenderTemplate}
+                                                        label={this.localize("Secondary Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSecSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.secTitle}
+                                                        label={this.localize("Secondary TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onSecTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Secondary Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.secBoldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onSecBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <ToggleButtonGroup size="small" value={this.state.secFontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onSecFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onSecFontSizeChange}
+                                                                value={this.state.secFontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onSecFontColorChange}
+                                                                value={this.state.secFontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.secAlignment} size="small" onChange={this.onSecAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Secondary Summary")}
+                                                            value={this.state.secSummary}
+                                                            onChange={this.onSecSummaryChanged}
+                                                            fluid />
+                                                    </div>
+
+                                                    <Input className="inputField"
+                                                        value={this.state.secAuthor}
+                                                        label={this.localize("Secondary Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onSecAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle}
+                                                        label={this.localize("Secondary ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onSecBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink}
+                                                        label={this.localize("Secondary ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onSecBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurReaction}
+                                                                onChange={this.onSecReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecReactionQuestionChanged}
+                                                        value={this.state.secReactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurFreeText}
+                                                                onChange={this.onSecFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecFreeTextQuestionChanged}
+                                                        value={this.state.secFreeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurYesNo}
+                                                                onChange={this.onSecYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecYesNoQuestionChanged}
+                                                        value={this.state.secYesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurLinkToSurvey}
+                                                                onChange={this.onSecToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Secondary Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onSecLinktoSurveyChanged}
+                                                        value={this.state.secLinkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
+                                            </Flex.Item>
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
+                                        </Flex>
+
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+
+                                    </Flex>
+                                </div>
+                            );
+                        }
                     } else if (this.state.template === "Event promotion with sessions to register/join") {
-                        return (
-                            <div className="taskModule">
-                                <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
-                                    <Flex className="scrollableContent">
-                                        <Flex.Item size="size.half">
-                                            <Flex column className="formContentContainer">
-                                                {/*<Dropdown*/}
-                                                {/*    className="senderTemplates"*/}
-                                                {/*    placeholder="Choose a Sender Template"*/}
-                                                {/*    value={this.state.senderTemplate}*/}
-                                                {/*    items={senderTemplates}*/}
-                                                {/*    checkable*/}
-                                                {/*    onChange={this.onSenderTemplateChanged}*/}
-                                                {/*/>*/}
-                                                <Input className="senderTemplates"
-                                                    value={this.state.senderTemplate}
-                                                    label={this.localize("Header")}
-                                                    placeholder={this.localize("HEADER")}
-                                                    onChange={this.onSenderTemplateChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    value={this.state.title}
-                                                    label={this.localize("TitleText")}
-                                                    placeholder={this.localize("PlaceHolderTitle")}
-                                                    onChange={this.onTitleChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input fluid className="inputField"
-                                                    value={this.state.imageLink}
-                                                    label={this.localize("ImageURL")}
-                                                    placeholder={this.localize("ImageURL")}
-                                                    onChange={this.onImageLinkChanged}
-                                                    error={!(this.state.errorImageUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
-
-                                                <div className="textArea">
-                                                    <Text content={this.localize("Summary")} />
-                                                    <Flex vAlign="center" hAlign="start">
-                                                        <ToggleButtonGroup size="small" value={this.state.boldSummary}>
-                                                            <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
-                                                                <FormatBoldIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <ToggleButtonGroup size="small" value={this.state.fontSummary} >
-                                                            <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
-                                                                <FontDownloadIcon />
-                                                            </ToggleButton>
-                                                        </ToggleButtonGroup>
-                                                        <Dropdown className="testDrop"
-                                                            items={FontSize}
-                                                            placeholder="FontSize"
-                                                            onChange={this.onFontSizeChange}
+                        if (this.state.language === "Primary") {
+                            return (
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
                                                         />
-                                                        <Dropdown className="testDrop"
-                                                            items={Color}
-                                                            placeholder="Color"
-                                                            onChange={this.onFontColorChange}
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
                                                         />
-                                                        <Grid item>
-                                                            <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
-                                                                <ToggleButton value="left">
-                                                                    <FormatAlignLeftIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="center">
-                                                                    <FormatAlignCenterIcon />
-                                                                </ToggleButton>
-                                                                <ToggleButton value="right">
-                                                                    <FormatAlignRightIcon />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")} />
+                                                    <Dropdown
+                                                        value={this.state.priLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.senderTemplate}
+                                                        label={this.localize("Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.title}
+                                                        label={this.localize("TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    {/*<Input fluid className="inputField"*/}
+                                                    {/*    value={this.state.imageLink}*/}
+                                                    {/*    label={this.localize("ImageURL")}*/}
+                                                    {/*    placeholder={this.localize("ImageURL")}*/}
+                                                    {/*    onChange={this.onImageLinkChanged}*/}
+                                                    {/*    error={!(this.state.errorImageUrlMessage === "")}*/}
+                                                    {/*    autoComplete="off"*/}
+                                                    {/*/>*/}
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.imageLink}
+                                                            label={this.localize("ImageURL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+    
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.boldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
                                                                 </ToggleButton>
                                                             </ToggleButtonGroup>
-                                                        </Grid>
-                                                    </Flex>
-                                                    <TextArea
-                                                        autoFocus
-                                                        placeholder={this.localize("Summary")}
-                                                        value={this.state.summary}
-                                                        onChange={this.onSummaryChanged}
-                                                        fluid />
-                                                </div>
-
-                                                <Input className="inputField"
-                                                    value={this.state.author}
-                                                    label={this.localize("Author")}
-                                                    placeholder={this.localize("Author")}
-                                                    onChange={this.onAuthorChanged}
-                                                    autoComplete="off"
-                                                    fluid
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle}
-                                                    label={this.localize("ButtonTitle")}
-                                                    placeholder={this.localize("ButtonTitle")}
-                                                    onChange={this.onBtnTitleChanged}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink}
-                                                    label={this.localize("ButtonURL")}
-                                                    placeholder={this.localize("ButtonURL")}
-                                                    onChange={this.onBtnLinkChanged}
-                                                    error={!(this.state.errorButtonUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
-
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle2}
-                                                    label={this.localize("Button title 2")}
-                                                    placeholder={this.localize("Button title 2")}
-                                                    onChange={this.onBtnTitleChanged2}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink2}
-                                                    label={this.localize("Button URL 2")}
-                                                    placeholder={this.localize("Button URL 2")}
-                                                    onChange={this.onBtnLinkChanged2}
-                                                    error={!(this.state.errorButtonUrlMessage2 === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage2 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage2} />
-
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle3}
-                                                    label={this.localize("Button title 3")}
-                                                    placeholder={this.localize("Button title 3")}
-                                                    onChange={this.onBtnTitleChanged3}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink3}
-                                                    label={this.localize("Button URL 3")}
-                                                    placeholder={this.localize("Button URL 3")}
-                                                    onChange={this.onBtnLinkChanged3}
-                                                    error={!(this.state.errorButtonUrlMessage3 === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage3 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage3} />
-
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle4}
-                                                    label={this.localize("Button title 4")}
-                                                    placeholder={this.localize("Button title 4")}
-                                                    onChange={this.onBtnTitleChanged4}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink4}
-                                                    label={this.localize("Button URL 4")}
-                                                    placeholder={this.localize("Button URL 4")}
-                                                    onChange={this.onBtnLinkChanged4}
-                                                    error={!(this.state.errorButtonUrlMessage4 === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage4 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage4} />
-
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnTitle5}
-                                                    label={this.localize("Button title 5")}
-                                                    placeholder={this.localize("Button title 5")}
-                                                    onChange={this.onBtnTitleChanged5}
-                                                    autoComplete="off"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    value={this.state.btnLink5}
-                                                    label={this.localize("Button URL 5")}
-                                                    placeholder={this.localize("Button URL 5")}
-                                                    onChange={this.onBtnLinkChanged5}
-                                                    error={!(this.state.errorButtonUrlMessage5 === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorButtonUrlMessage5 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage5} />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surReaction}
-                                                            onChange={this.onReactionChanged}
-                                                        />
-                                                    }
-                                                    label="Reaction"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for reaction")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onReactionQuestionChanged}
-                                                    value={this.state.reactionQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surFreeText}
-                                                            onChange={this.onFreeTextChanged}
-                                                        />
-                                                    }
-                                                    label="Free Text"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for for free text")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onFreeTextQuestionChanged}
-                                                    value={this.state.freeTextQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surYesNo}
-                                                            onChange={this.onYesNoChanged}
-                                                        />
-                                                    }
-                                                    label="Yes/ No Question"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Question for Yes / No")}
-                                                    placeholder={this.localize("Enter the question")}
-                                                    onChange={this.onYesNoQuestionChanged}
-                                                    value={this.state.yesNoQuestion}
-                                                    autoComplete="off"
-                                                />
-                                                <FormControlLabel
-                                                    control={
-                                                        <Switch
-                                                            color="primary"
-                                                            checked={this.state.surLinkToSurvey}
-                                                            onChange={this.onToggleLinktoSurveyChanged}
-                                                        />
-                                                    }
-                                                    label="Link to Survey"
-                                                />
-                                                <Input className="inputField"
-                                                    fluid
-                                                    label={this.localize("Survey URL")}
-                                                    placeholder={this.localize("Enter URL")}
-                                                    onChange={this.onLinktoSurveyChanged}
-                                                    value={this.state.linkToSurvey}
-                                                    error={!(this.state.errorLinkToSurveyUrlMessage === "")}
-                                                    autoComplete="off"
-                                                />
-                                                <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
-                                            </Flex>
-                                        </Flex.Item>
-                                        <Flex.Item size="size.half">
-                                            <div className="adaptiveCardContainer">
-                                            </div>
-                                        </Flex.Item>
-                                    </Flex>
-
-                                    <Flex className="footerContainer" vAlign="end" hAlign="end">
-                                        <Flex className="buttonContainer">
-                                            <Flex.Item push>
-                                                <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                            <ToggleButtonGroup size="small" value={this.state.fontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onFontSizeChange}
+                                                                value={this.state.fontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onFontColorChange}
+                                                                value={this.state.fontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.alignment} size="small" onChange={this.onAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.summary}
+                                                            onChange={this.onSummaryChanged}
+                                                            fluid />
+                                                    </div>
+    
+                                                    <Input className="inputField"
+                                                        value={this.state.author}
+                                                        label={this.localize("Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle}
+                                                        label={this.localize("ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink}
+                                                        label={this.localize("ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle2}
+                                                        label={this.localize("Button title 2")}
+                                                        placeholder={this.localize("Button title 2")}
+                                                        onChange={this.onBtnTitleChanged2}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink2}
+                                                        label={this.localize("Button URL 2")}
+                                                        placeholder={this.localize("Button URL 2")}
+                                                        onChange={this.onBtnLinkChanged2}
+                                                        error={!(this.state.errorButtonUrlMessage2 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage2 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage2} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle3}
+                                                        label={this.localize("Button title 3")}
+                                                        placeholder={this.localize("Button title 3")}
+                                                        onChange={this.onBtnTitleChanged3}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink3}
+                                                        label={this.localize("Button URL 3")}
+                                                        placeholder={this.localize("Button URL 3")}
+                                                        onChange={this.onBtnLinkChanged3}
+                                                        error={!(this.state.errorButtonUrlMessage3 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage3 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage3} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle4}
+                                                        label={this.localize("Button title 4")}
+                                                        placeholder={this.localize("Button title 4")}
+                                                        onChange={this.onBtnTitleChanged4}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink4}
+                                                        label={this.localize("Button URL 4")}
+                                                        placeholder={this.localize("Button URL 4")}
+                                                        onChange={this.onBtnLinkChanged4}
+                                                        error={!(this.state.errorButtonUrlMessage4 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage4 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage4} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnTitle5}
+                                                        label={this.localize("Button title 5")}
+                                                        placeholder={this.localize("Button title 5")}
+                                                        onChange={this.onBtnTitleChanged5}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.btnLink5}
+                                                        label={this.localize("Button URL 5")}
+                                                        placeholder={this.localize("Button URL 5")}
+                                                        onChange={this.onBtnLinkChanged5}
+                                                        error={!(this.state.errorButtonUrlMessage5 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage5 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage5} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surReaction}
+                                                                onChange={this.onReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onReactionQuestionChanged}
+                                                        value={this.state.reactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surFreeText}
+                                                                onChange={this.onFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onFreeTextQuestionChanged}
+                                                        value={this.state.freeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surYesNo}
+                                                                onChange={this.onYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onYesNoQuestionChanged}
+                                                        value={this.state.yesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.surLinkToSurvey}
+                                                                onChange={this.onToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onLinktoSurveyChanged}
+                                                        value={this.state.linkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
                                             </Flex.Item>
-                                            <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
                                         </Flex>
+    
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                            </Flex>
+                                        </Flex>
+    
                                     </Flex>
-
-                                </Flex>
-                            </div>
-                        );
+                                </div>
+                            );
+                        } else if (this.state.language === "Secondary") {
+                            return (
+                                <div className="taskModule">
+                                    <Flex column className="formContainer" vAlign="stretch" gap="gap.small">
+                                        <Flex className="scrollableContent">
+                                            <Flex.Item size="size.half">
+                                                <Flex column className="formContentContainer">
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Primary")}
+                                                            value="Primary"
+                                                        />
+                                                        <Button
+                                                            onClick={this.switchLanguage}
+                                                            content={this.localize("Secondary")}
+                                                            value="Secondary"
+                                                        />
+                                                    </Flex>
+                                                    <Text content={this.localize("Language")}/>
+                                                    <Dropdown
+                                                        value={this.state.secLanguage}
+                                                        items={language}
+                                                        onChange={this.selectLanguage}
+                                                        placeholder={this.state.secLanguage}
+                                                        className="testDrop" 
+                                                    />
+                                                    <Input className="senderTemplates"
+                                                        value={this.state.secSenderTemplate}
+                                                        label={this.localize("Secondary Header")}
+                                                        placeholder={this.localize("HEADER")}
+                                                        onChange={this.onSecSenderTemplateChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        value={this.state.secTitle}
+                                                        label={this.localize("Secondary TitleText")}
+                                                        placeholder={this.localize("PlaceHolderTitle")}
+                                                        onChange={this.onSecTitleChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <Input fluid className="inputField"
+                                                            value={this.state.secImageLink}
+                                                            label={this.localize("Secondary ImageURL")}
+                                                            placeholder={this.localize("ImageURL")}
+                                                            onChange={this.onSecImageLinkChanged}
+                                                            error={!(this.state.errorImageUrlMessage === "")}
+                                                            autoComplete="off"
+                                                        />
+                                                        <input type="file" accept="image/"
+                                                            style={{ display: 'none' }}
+                                                            onChange={this.handleSecImageSelection}
+                                                            ref={this.fileInput} />
+                                                        <Flex.Item push>
+                                                            <Button circular onClick={this.handleSecUploadClick}
+                                                                style={{ width: '10px' }}
+                                                                size="small"
+                                                                icon={<FilesUploadIcon />}
+                                                                title="UploadImage"
+                                                            />
+                                                        </Flex.Item>
+                                                    </Flex>
+                                                    <Text className={(this.state.errorImageUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorImageUrlMessage} />
+    
+                                                    <div className="textArea">
+                                                        <Text content={this.localize("Secondary Summary")} />
+                                                        <Flex vAlign="center" hAlign="start">
+                                                            <ToggleButtonGroup size="small" value={this.state.secBoldSummary}>
+                                                                <ToggleButton value="Bold" onClick={this.onSecBoldSummaryChange}>
+                                                                    <FormatBoldIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <ToggleButtonGroup size="small" value={this.state.secFontSummary} >
+                                                                <ToggleButton value="Monospace" onClick={this.onSecFontSummaryChange}>
+                                                                    <FontDownloadIcon />
+                                                                </ToggleButton>
+                                                            </ToggleButtonGroup>
+                                                            <Dropdown className="testDrop"
+                                                                items={FontSize}
+                                                                placeholder="FontSize"
+                                                                onChange={this.onSecFontSizeChange}
+                                                                value={this.state.secFontSizeSummary}
+                                                            />
+                                                            <Dropdown className="testDrop"
+                                                                items={Color}
+                                                                placeholder="Color"
+                                                                onChange={this.onSecFontColorChange}
+                                                                value={this.state.secFontColorSummary}
+                                                            />
+                                                            <Grid item>
+                                                                <ToggleButtonGroup value={this.state.secAlignment} size="small" onChange={this.onSecAlignmentChange} exclusive>
+                                                                    <ToggleButton value="left">
+                                                                        <FormatAlignLeftIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="center">
+                                                                        <FormatAlignCenterIcon />
+                                                                    </ToggleButton>
+                                                                    <ToggleButton value="right">
+                                                                        <FormatAlignRightIcon />
+                                                                    </ToggleButton>
+                                                                </ToggleButtonGroup>
+                                                            </Grid>
+                                                        </Flex>
+                                                        <TextArea
+                                                            autoFocus
+                                                            placeholder={this.localize("Summary")}
+                                                            value={this.state.secSummary}
+                                                            onChange={this.onSecSummaryChanged}
+                                                            fluid />
+                                                    </div>
+    
+                                                    <Input className="inputField"
+                                                        value={this.state.secAuthor}
+                                                        label={this.localize("Secondary Author")}
+                                                        placeholder={this.localize("Author")}
+                                                        onChange={this.onSecAuthorChanged}
+                                                        autoComplete="off"
+                                                        fluid
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle}
+                                                        label={this.localize("Secondary ButtonTitle")}
+                                                        placeholder={this.localize("ButtonTitle")}
+                                                        onChange={this.onSecBtnTitleChanged}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink}
+                                                        label={this.localize("Secondary ButtonURL")}
+                                                        placeholder={this.localize("ButtonURL")}
+                                                        onChange={this.onSecBtnLinkChanged}
+                                                        error={!(this.state.errorButtonUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle2}
+                                                        label={this.localize("Secondary Button title 2")}
+                                                        placeholder={this.localize("Button title 2")}
+                                                        onChange={this.onSecBtnTitleChanged2}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink2}
+                                                        label={this.localize("Secondary Secondary Button URL 2")}
+                                                        placeholder={this.localize("Button URL 2")}
+                                                        onChange={this.onSecBtnLinkChanged2}
+                                                        error={!(this.state.errorButtonUrlMessage2 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage2 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage2} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle3}
+                                                        label={this.localize("Secondary Button title 3")}
+                                                        placeholder={this.localize("Button title 3")}
+                                                        onChange={this.onSecBtnTitleChanged3}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink3}
+                                                        label={this.localize("Secondary Button URL 3")}
+                                                        placeholder={this.localize("Button URL 3")}
+                                                        onChange={this.onSecBtnLinkChanged3}
+                                                        error={!(this.state.errorButtonUrlMessage3 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage3 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage3} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle4}
+                                                        label={this.localize("Secondary Button title 4")}
+                                                        placeholder={this.localize("Button title 4")}
+                                                        onChange={this.onSecBtnTitleChanged4}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink4}
+                                                        label={this.localize("Secondary Button URL 4")}
+                                                        placeholder={this.localize("Button URL 4")}
+                                                        onChange={this.onSecBtnLinkChanged4}
+                                                        error={!(this.state.errorButtonUrlMessage4 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage4 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage4} />
+    
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnTitle5}
+                                                        label={this.localize("Secondary Button title 5")}
+                                                        placeholder={this.localize("Button title 5")}
+                                                        onChange={this.onSecBtnTitleChanged5}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        value={this.state.secbtnLink5}
+                                                        label={this.localize("Secondary Button URL 5")}
+                                                        placeholder={this.localize("Button URL 5")}
+                                                        onChange={this.onSecBtnLinkChanged5}
+                                                        error={!(this.state.errorButtonUrlMessage5 === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorButtonUrlMessage5 === "") ? "hide" : "show"} error size="small" content={this.state.errorButtonUrlMessage5} />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurReaction}
+                                                                onChange={this.onSecReactionChanged}
+                                                            />
+                                                        }
+                                                        label="Reaction"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for reaction")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecReactionQuestionChanged}
+                                                        value={this.state.secReactionQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurFreeText}
+                                                                onChange={this.onSecFreeTextChanged}
+                                                            />
+                                                        }
+                                                        label="Free Text"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for for free text")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecFreeTextQuestionChanged}
+                                                        value={this.state.secFreeTextQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurYesNo}
+                                                                onChange={this.onSecYesNoChanged}
+                                                            />
+                                                        }
+                                                        label="Yes/ No Question"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Question for Yes / No")}
+                                                        placeholder={this.localize("Enter the question")}
+                                                        onChange={this.onSecYesNoQuestionChanged}
+                                                        value={this.state.secYesNoQuestion}
+                                                        autoComplete="off"
+                                                    />
+                                                    <FormControlLabel
+                                                        control={
+                                                            <Switch
+                                                                color="primary"
+                                                                checked={this.state.secSurLinkToSurvey}
+                                                                onChange={this.onSecToggleLinktoSurveyChanged}
+                                                            />
+                                                        }
+                                                        label="Secondary Link to Survey"
+                                                    />
+                                                    <Input className="inputField"
+                                                        fluid
+                                                        label={this.localize("Secondary Survey URL")}
+                                                        placeholder={this.localize("Enter URL")}
+                                                        onChange={this.onSecLinktoSurveyChanged}
+                                                        value={this.state.secLinkToSurvey}
+                                                        error={!(this.state.errorLinkToSurveyUrlMessage === "")}
+                                                        autoComplete="off"
+                                                    />
+                                                    <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+                                                </Flex>
+                                            </Flex.Item>
+                                            <Flex.Item size="size.half">
+                                                <div className="adaptiveCardContainer">
+                                                </div>
+                                            </Flex.Item>
+                                        </Flex>
+    
+                                        <Flex className="footerContainer" vAlign="end" hAlign="end">
+                                            <Flex className="buttonContainer">
+                                                <Flex.Item push>
+                                                    <Button content={this.localize("Back")} onClick={this.onBack} secondary />
+                                                </Flex.Item>
+                                                <Button content={this.localize("Next")} disabled={this.isNextBtnDisabled()} id="saveBtn" onClick={this.onNext} primary />
+                                                <Button content={this.localize("Test")} onClick={this.printCon} />
+                                            </Flex>
+                                        </Flex>
+    
+                                    </Flex>
+                                </div>
+                            );
+                        }
                     }
                     return (
                         <div></div>
@@ -3578,36 +4988,67 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
         const draftMessage: IDraftMessage = {
             senderTemplate: this.state.senderTemplate,
+            secSenderTemplate: this.state.secSenderTemplate,
+            priLanguage: this.state.priLanguage,
+            secLanguage: this.state.secLanguage,
             template: this.state.template,
             id: this.state.messageId,
             title: this.state.title,
+            secTitle: this.state.secTitle,
             imageLink: this.state.imageLink,
+            secImageLink: this.state.secImageLink,
             videoLink: this.state.videoLink,
+            secVideoLink: this.state.secVideoLink,
             summary: this.state.summary,
+            secSummary: this.state.secSummary,
             alignment: this.state.alignment,
+            secAlignment: this.state.secAlignment,
             boldSummary: this.state.boldSummary,
+            secBoldSummary: this.state.secBoldSummary,
             fontSummary: this.state.fontSummary,
+            secFontSummary: this.state.secFontSummary,
             fontSizeSummary: this.state.fontSizeSummary,
+            secFontSizeSummary: this.state.secFontSizeSummary,
             fontColorSummary: this.state.fontColorSummary,
+            secFontColorSummary: this.state.secFontColorSummary,
             author: this.state.author,
+            secAuthor: this.state.secAuthor,
             buttonTitle: this.state.btnTitle,
+            secButtonTitle: this.state.secbtnTitle,
             buttonLink: this.state.btnLink,
+            secButtonLink: this.state.secbtnLink,
             buttonTitle2: this.state.btnTitle2,
+            secButtonTitle2: this.state.secbtnTitle2,
             buttonLink2: this.state.btnLink2,
+            secButtonLink2: this.state.secbtnLink2,
             buttonTitle3: this.state.btnTitle3,
+            secButtonTitle3: this.state.secbtnTitle3,
             buttonLink3: this.state.btnLink3,
+            secButtonLink3: this.state.secbtnLink3,
             buttonTitle4: this.state.btnTitle4,
+            secButtonTitle4: this.state.secbtnTitle4,
             buttonLink4: this.state.btnLink4,
+            secButtonLink4: this.state.secbtnLink4,
             buttonTitle5: this.state.btnTitle5,
+            secButtonTitle5: this.state.secbtnTitle5,
             buttonLink5: this.state.btnLink5,
+            secButtonLink5: this.state.secbtnLink5,
             surReaction: this.state.surReaction,
+            secSurReaction: this.state.secSurReaction,
             reactionQuestion: this.state.reactionQuestion,
+            secReactionQuestion: this.state.secReactionQuestion,
             surFreeText: this.state.surFreeText,
+            secSurFreeText: this.state.secSurFreeText,
             freeTextQuestion: this.state.freeTextQuestion,
+            secFreeTextQuestion: this.state.secFreeTextQuestion,
             surYesNo: this.state.surYesNo,
+            secSurYesNo: this.state.secSurYesNo,
             yesNoQuestion: this.state.yesNoQuestion,
+            secYesNoQuestion: this.state.secYesNoQuestion,
             surLinkToSurvey: this.state.surLinkToSurvey,
+            secSurLinkToSurvey: this.state.secSurLinkToSurvey,
             linkToSurvey: this.state.linkToSurvey,
+            secLinkToSurvey: this.state.secLinkToSurvey,
             teams: selectedTeams,
             rosters: selctedRosters,
             //rosters: ["19:e0dRe1TRSqFur-yWALdrniodjxblg_TeTb-L6Bn0kXQ1@thread.tacv2"],
@@ -3678,6 +5119,9 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             this.setState({
                 alignment: "left",
                 page: "TemplateSelection",
+                language: "Primary",
+                priLanguage: "English",
+                secLanguage: "",
                 title: "",
                 summary: "",
                 fontSummary: "",
@@ -3707,6 +5151,35 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 yesNoQuestion: "",
                 surLinkToSurvey: false,
                 linkToSurvey: "",
+                secTitle: "",
+                secImageLink: "",
+                secVideoLink: "",
+                secAlignment: "left",
+                secSummary: "",
+                secBoldSummary: "",
+                secFontSummary: "",
+                secFontSizeSummary: "",
+                secFontColorSummary: "",
+                secAuthor: "",
+                secbtnTitle: "",
+                secbtnLink: "",
+                secbtnTitle2: "",
+                secbtnLink2: "",
+                secbtnTitle3: "",
+                secbtnLink3: "",
+                secbtnTitle4: "",
+                secbtnLink4: "",
+                secbtnTitle5: "",
+                secbtnLink5: "",
+                secSurReaction: false,
+                secReactionQuestion: "",
+                secSurFreeText: false,
+                secFreeTextQuestion: "",
+                secSurYesNo: false,
+                secYesNoQuestion: "",
+                secSurLinkToSurvey: false,
+                secLinkToSurvey: "",
+                secSenderTemplate: "",
                 card:
                 {
                     "type": "AdaptiveCard",
@@ -4760,7 +6233,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         SetFreeTextQuestion(this.card, this.state.freeTextQuestion);
         setYesNoQuestion(this.card, this.state.yesNoQuestion);
         setLinktoSurvey(this.card, this.state.linkToSurvey);
-        if (this.state.btnTitle4 && event.target.value) {
+        if (this.state.btnTitle5 && event.target.value) {
             setCardBtn5(this.card, this.state.btnTitle5, event.target.value);
             this.setState({
                 btnLink5: event.target.value,
@@ -5127,6 +6600,389 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setState({
             emailOption: !this.state.emailOption
         })
+    }
+
+    //For Secondary Language Handle
+    private onSecSenderTemplateChanged = (event: any, itemsData: any) => {
+        this.setState({
+            secSenderTemplate: itemsData.value
+        });
+    }
+
+    private onSecTitleChanged = (event: any) => {
+        this.setState({
+            secTitle: event.target.value
+        });
+    }
+
+    private onSecImageLinkChanged = (event: any) => {
+        let url = event.target.value.toLowerCase();
+        if (!((url === "") || (url.startsWith("https://") || (url.startsWith("data:image/png;base64,")) || (url.startsWith("data:image/jpeg;base64,")) || (url.startsWith("data:image/gif;base64,"))))) {
+            this.setState({
+                errorImageUrlMessage: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorImageUrlMessage: ""
+            });
+        }
+        this.setState({
+            secImageLink: event.target.value
+        });
+    }
+
+    private onSecVideoLinkChanged = (event: any) => {
+        let url = event.target.value.toLowerCase();
+        if (!((url === "") || (url.startsWith("https://") || (url.startsWith("data:image/png;base64,")) || (url.startsWith("data:image/jpeg;base64,")) || (url.startsWith("data:image/gif;base64,"))))) {
+            this.setState({
+                errorVideoUrlMessage: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorVideoUrlMessage: ""
+            });
+        }
+        this.setState({
+            secVideoLink: event.target.value
+        });
+    }
+
+    private onSecBoldSummaryChange = (event: any) => {
+        if (this.state.secBoldSummary === "Bold") {
+            this.setState({
+                secBoldSummary: ""
+            });
+        } else {
+            this.setState({
+                secBoldSummary: "Bold"
+            });
+        }
+
+    }
+
+    private onSecFontSummaryChange = (event: any) => {
+        if (this.state.secFontSummary === "Monospace") {
+            this.setState({
+                secFontSummary: ""
+            });
+        } else {
+            this.setState({
+                secFontSummary: "Monospace"
+            });
+        }
+    }
+
+    private onSecFontSizeChange = (event: any, itemsData: any) => {
+        if (itemsData.value === "Default") {
+            this.setState({
+                secFontSizeSummary: "default"
+            });
+        } else if (itemsData.value === "Small") {
+            this.setState({
+                secFontSizeSummary: "small"
+            });
+        } else if (itemsData.value === "Medium") {
+            this.setState({
+                secFontSizeSummary: "medium"
+            });
+        } else if (itemsData.value === "Large") {
+            this.setState({
+                secFontSizeSummary: "large"
+            });
+        } else if (itemsData.value === "ExtraLarge") {
+            this.setState({
+                secFontSizeSummary: "extraLarge"
+            });
+        }
+    }
+
+    private onSecFontColorChange = (event: any, itemsData: any) => {
+        if (itemsData.value === "Default") {
+            this.setState({
+                secFontColorSummary: "default"
+            });
+        } else if (itemsData.value === "Accent") {
+            this.setState({
+                secFontColorSummary: "accent"
+            });
+        } else if (itemsData.value === "Good") {
+            this.setState({
+                secFontColorSummary: "good"
+            });
+        } else if (itemsData.value === "Warning") {
+            this.setState({
+                secFontColorSummary: "warning"
+            });
+        } else if (itemsData.value === "Attention") {
+            this.setState({
+                secFontColorSummary: "attention"
+            });
+        } else if (itemsData.value === "Light") {
+            this.setState({
+                secFontColorSummary: "light"
+            });
+        } else if (itemsData.value === "Dark") {
+            this.setState({
+                secFontColorSummary: "dark"
+            });
+        }
+    }
+
+    private onSecAlignmentChange = (event: any, onAlignmentChange: any) => {
+        if (onAlignmentChange === "left") {
+            this.setState({
+                secAlignment: "left"
+            });
+        } else if (onAlignmentChange === "center") {
+            this.setState({
+                secAlignment: "center"
+            });
+        } else if (onAlignmentChange === "right") {
+            this.setState({
+                secAlignment: "right"
+            });
+        }
+    }
+
+    private onSecSummaryChanged = (event: any) => {
+        this.setState({
+            secSummary: event.target.value
+        });
+    }
+
+    private onSecAuthorChanged = (event: any) => {
+        this.setState({
+            secAuthor: event.target.value
+        });
+    }
+
+    private onSecBtnTitleChanged = (event: any) => {
+        if (event.target.value && this.state.secbtnLink) {
+            this.setState({
+                secbtnTitle: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnTitle: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnTitleChanged2 = (event: any) => {
+        if (event.target.value && this.state.secbtnLink2) {
+            this.setState({
+                secbtnTitle2: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnTitle2: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnTitleChanged3 = (event: any) => {
+        if (event.target.value && this.state.secbtnLink3) {
+            this.setState({
+                secbtnTitle3: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnTitle3: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnTitleChanged4 = (event: any) => {
+        if (event.target.value && this.state.secbtnLink4) {
+            this.setState({
+                secbtnTitle4: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnTitle4: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnTitleChanged5 = (event: any) => {
+        if (event.target.value && this.state.secbtnLink5) {
+            this.setState({
+                secbtnTitle5: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnTitle5: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnLinkChanged = (event: any) => {
+        if (!(event.target.value === "" || event.target.value.toLowerCase().startsWith("https://"))) {
+            this.setState({
+                errorButtonUrlMessage: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorButtonUrlMessage: ""
+            });
+        }
+
+        if (this.state.secbtnTitle && event.target.value) {
+            this.setState({
+                secbtnLink: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnLink: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnLinkChanged2 = (event: any) => {
+        if (!(event.target.value === "" || event.target.value.toLowerCase().startsWith("https://"))) {
+            this.setState({
+                errorButtonUrlMessage2: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorButtonUrlMessage2: ""
+            });
+        }
+
+        if (this.state.secbtnTitle2 && event.target.value) {
+            this.setState({
+                secbtnLink2: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnLink2: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnLinkChanged3 = (event: any) => {
+        if (!(event.target.value === "" || event.target.value.toLowerCase().startsWith("https://"))) {
+            this.setState({
+                errorButtonUrlMessage3: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorButtonUrlMessage3: ""
+            });
+        }
+
+        if (this.state.secbtnTitle3 && event.target.value) {
+            this.setState({
+                secbtnLink3: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnLink3: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnLinkChanged4 = (event: any) => {
+        if (!(event.target.value === "" || event.target.value.toLowerCase().startsWith("https://"))) {
+            this.setState({
+                errorButtonUrlMessage4: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorButtonUrlMessage4: ""
+            });
+        }
+
+        if (this.state.secbtnTitle4 && event.target.value) {
+            this.setState({
+                secbtnLink4: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnLink4: event.target.value
+            });
+        }
+    }
+
+    private onSecBtnLinkChanged5 = (event: any) => {
+        if (!(event.target.value === "" || event.target.value.toLowerCase().startsWith("https://"))) {
+            this.setState({
+                errorButtonUrlMessage5: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorButtonUrlMessage5: ""
+            });
+        }
+
+        if (this.state.secbtnTitle5 && event.target.value) {
+            this.setState({
+                secbtnLink5: event.target.value
+            });
+        } else {
+            this.setState({
+                secbtnLink5: event.target.value
+            });
+        }
+    }
+
+    private onSecReactionChanged = (event: any) => {
+        this.setState({
+            secSurReaction: !this.state.secSurReaction
+        });
+    }
+
+    private onSecReactionQuestionChanged = (event: any) => {
+        this.setState({
+            secReactionQuestion: event.target.value
+        });
+    }
+
+    private onSecFreeTextChanged = (event: any) => {
+        this.setState({
+            secSurFreeText: !this.state.secSurFreeText
+        });
+    }
+
+    private onSecFreeTextQuestionChanged = (event: any) => {
+        this.setState({
+            secFreeTextQuestion: event.target.value
+        });
+    }
+
+    private onSecYesNoChanged = (event: any) => {
+        this.setState({
+            secSurYesNo: !this.state.secSurYesNo
+        });
+    }
+
+    private onSecYesNoQuestionChanged = (event: any) => {
+        this.setState({
+            secYesNoQuestion: event.target.value
+        });
+    }
+
+    private onSecToggleLinktoSurveyChanged = (event: any) => {
+        this.setState({
+            secSurLinkToSurvey: !this.state.secSurLinkToSurvey
+        });
+    }
+
+    private onSecLinktoSurveyChanged = (event: any) => {
+        let url = event.target.value.toLowerCase();
+        if (!((url === "") || (url.startsWith("https://") || (url.startsWith("data:image/png;base64,")) || (url.startsWith("data:image/jpeg;base64,")) || (url.startsWith("data:image/gif;base64,"))))) {
+            this.setState({
+                errorLinkToSurveyUrlMessage: this.localize("ErrorURLMessage")
+            });
+        } else {
+            this.setState({
+                errorLinkToSurveyUrlMessage: ""
+            });
+        }
+
+        this.setState({
+            secLinkToSurvey: event.target.value
+        });
     }
 }
 

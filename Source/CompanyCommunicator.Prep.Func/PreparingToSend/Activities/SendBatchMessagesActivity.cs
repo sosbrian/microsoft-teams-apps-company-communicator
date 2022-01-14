@@ -86,6 +86,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
                         ServiceUrl = recipient.ServiceUrl,
                         TenantId = recipient.TenantId,
                         UserType = recipient.UserType,
+                        Preference = recipient.Preference,
                     },
                 };
             }
@@ -95,6 +96,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
                 {
                     RecipientType = RecipientDataType.Team,
                     RecipientId = recipient.RecipientId,
+                    Preference = recipient.Preference,
                     TeamData = new TeamDataEntity
                     {
                         TeamId = recipient.RecipientId,

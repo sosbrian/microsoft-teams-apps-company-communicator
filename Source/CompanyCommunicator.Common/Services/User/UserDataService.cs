@@ -92,6 +92,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.User
                 ConversationId = partitionKey.Equals(UserDataTableNames.UserDataPartition) ? activity?.Conversation?.Id : null,
                 ServiceUrl = activity?.ServiceUrl,
                 TenantId = activity?.Conversation?.TenantId,
+                Preference = "English",
 
                 // Setting this userType value as Member, since the guest userType is skipped.
                 UserType = UserType.Member,

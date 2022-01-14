@@ -59,5 +59,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
         /// Gets or sets the user type i.e. Member or Guest.
         /// </summary>
         public string UserType { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user Preference.
+        /// </summary>
+        public string Preference { get; set; }
     }
 }

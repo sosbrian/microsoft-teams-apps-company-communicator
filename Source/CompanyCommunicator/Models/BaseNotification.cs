@@ -18,6 +18,16 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         public string Id { get; set; }
 
         /// <summary>
+        /// Gets or sets PriLanguage value.
+        /// </summary>
+        public string PriLanguage { get; set; }
+
+        /// <summary>
+        /// Gets or sets SecLanguage value.
+        /// </summary>
+        public string SecLanguage { get; set; }
+
+        /// <summary>
         /// Gets or sets Template value.
         /// </summary>
         public string Template { get; set; }
@@ -166,6 +176,151 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets the Survey Link link value.
         /// </summary>
         public string LinkToSurvey { get; set; }
+
+        /// <summary>
+        /// Gets or sets SecSenderTemplate value.
+        /// </summary>
+        public string SecSenderTemplate { get; set; }
+
+        /// <summary>
+        /// Gets or sets SecTitle value.
+        /// </summary>
+        public string SecTitle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecImage Link value.
+        /// </summary>
+        public string SecImageLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecVideo Link value.
+        /// </summary>
+        public string SecVideoLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSummary value.
+        /// </summary>
+        public string SecSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Secsummary alignment of the notification's content.
+        /// </summary>
+        public string SecAlignment { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Secsummary bold of the notification's content.
+        /// </summary>
+        public string SecBoldSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Secsummary font of the notification's content.
+        /// </summary>
+        public string SecFontSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Secsummary font size of the notification's content.
+        /// </summary>
+        public string SecFontSizeSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Secsummary font Color of the notification's content.
+        /// </summary>
+        public string SecFontColorSummary { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecAuthor value.
+        /// </summary>
+        public string SecAuthor { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Title value.
+        /// </summary>
+        public string SecButtonTitle { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Link value.
+        /// </summary>
+        public string SecButtonLink { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Title value.
+        /// </summary>
+        public string SecButtonTitle2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Link value.
+        /// </summary>
+        public string SecButtonLink2 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Title value.
+        /// </summary>
+        public string SecButtonTitle3 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Link value.
+        /// </summary>
+        public string SecButtonLink3 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Title value.
+        /// </summary>
+        public string SecButtonTitle4 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Link value.
+        /// </summary>
+        public string SecButtonLink4 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Title value.
+        /// </summary>
+        public string SecButtonTitle5 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecButton Link value.
+        /// </summary>
+        public string SecButtonLink5 { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Reaction value.
+        /// </summary>
+        public bool SecSurReaction { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Reaction question value.
+        /// </summary>
+        public string SecReactionQuestion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Free Text value.
+        /// </summary>
+        public bool SecSurFreeText { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Free Text question value.
+        /// </summary>
+        public string SecFreeTextQuestion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey yes/no value.
+        /// </summary>
+        public bool SecSurYesNo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey yes/no question value.
+        /// </summary>
+        public string SecYesNoQuestion { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Link value.
+        /// </summary>
+        public bool SecSurLinkToSurvey { get; set; }
+
+        /// <summary>
+        /// Gets or sets the SecSurvey Link link value.
+        /// </summary>
+        public string SecLinkToSurvey { get; set; }
 
         /// <summary>
         /// Gets or sets the Created DateTime value.

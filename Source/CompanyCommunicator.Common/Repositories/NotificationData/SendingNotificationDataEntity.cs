@@ -23,5 +23,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// Gets or sets the content of the notification in serialized JSON form.
         /// </summary>
         public string Content { get; set; }
+
+        /// <summary>
+        /// Gets or sets the content of the notification in serialized JSON form.
+        /// </summary>
+        public string Content2 { get; set; }
     }
 }

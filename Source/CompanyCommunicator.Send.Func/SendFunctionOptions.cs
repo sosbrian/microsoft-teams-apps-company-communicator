@@ -50,5 +50,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
         /// Gets or sets the AppServiceUri for Adaptive Card.
         /// </summary>
         public string AppServiceUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets the TaskModuleAppID for Adaptive Card.
+        /// </summary>
+        public string TaskModuleAppID { get; set; }
     }
 }

@@ -263,6 +263,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Prep.Func.PreparingToSend
                 ConversationId = recipient.ConversationId,
                 ServiceUrl = recipient.ServiceUrl,
                 TenantId = recipient.TenantId,
+                Preference = recipient.Preference,
 
                 // Setting the userType value as Member,
                 // since only Member type users is allowed to be stored in Sent Notification Table.

@@ -119,6 +119,10 @@
                 .testDrop {
                     //width: 100%;
                     border-radius: 0px;
+                    display: block;
+                    .ui-dropdown__container {
+                        width: 100%;
+                    }
                 }
 
 

@@ -186,6 +186,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         public string UserId { get; set; }
 
         /// <summary>
+        /// Gets or sets the user id for the recipient.
+        /// </summary>
+        public string Preference { get; set; }
+
+        /// <summary>
         /// Gets or sets the error message for the last recorded error the bot encountered
         /// when attempting to process the queue message. If a request
         /// is retried and eventually is successful, this field will still be filled

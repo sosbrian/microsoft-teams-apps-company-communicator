@@ -13,13 +13,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using AdaptiveCards;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Bot.Schema;
+    using Microsoft.Extensions.Options;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Bot;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.SendQueue;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard;
-    using Microsoft.Teams.Apps.CompanyCommunicator.Bot;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
     using Microsoft.Bot.Builder;
     using Microsoft.Bot.Builder.Integration.AspNet.Core;
 
@@ -36,6 +35,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         private readonly BotFrameworkHttpAdapter adapter;
         private readonly IBot authorBot;
         private readonly IBot userBot;
+        //private readonly string taskModuleAppId;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GetUpdatedCardController"/> class.
@@ -43,6 +43,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// <param name="sentNotificationDataRepository">Sent notification data repository instance.</param>
         /// <param name="notificationDataRepository">Sent notification data repository instance. Whatvever la. Who cares param.</param>
         /// <param name="notificationRepo">Sent notification data repository instance. Whatvever la. Who cares param. WFC.</param>
+        /// <param name="botOptions">The bot options.</param>
         public GetUpdatedCardController(
             INotificationDataRepository notificationDataRepository,
             ISendingNotificationDataRepository notificationRepo,
@@ -51,6 +52,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             CompanyCommunicatorBotAdapter adapter,
             AuthorTeamsActivityHandler authorBot,
             UserTeamsActivityHandler userBot)
+            //IOptions<BotOptions> botOptions)
         {
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
             this.adaptiveCardCreator = adaptiveCardCreator ?? throw new ArgumentException(nameof(adaptiveCardCreator));
@@ -59,6 +61,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             this.adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
             this.authorBot = authorBot ?? throw new ArgumentNullException(nameof(authorBot));
             this.userBot = userBot ?? throw new ArgumentNullException(nameof(userBot));
+            //var options = botOptions ?? throw new ArgumentNullException(nameof(botOptions));
+            //this.taskModuleAppId = options.Value.TaskModuleAppID;
         }
 
         /// <summary>
@@ -78,7 +82,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
             var textNotification = await this.notificationDataRepository.GetAsync(
                 NotificationDataTableNames.SentNotificationsPartition,
                 notificationId);
-            var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, false);
+            var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, false, true);
 
             if ((textNotification.SurReaction == true && notification.ReactionResult == string.Empty)
                 || (textNotification.SurFreeText == true && notification.FreeTextResult == string.Empty)
@@ -91,7 +95,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 || (textNotification.SurFreeText == true && notification.FreeTextResult != string.Empty)
                 || (textNotification.SurYesNo == true && notification.YesNoResult != string.Empty))
             {
-                vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true);
+                vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true, true);
             }
 
             var test = vCard.ToJson()
@@ -100,6 +104,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
 
             this.Response.Headers.Add("CARD-UPDATE-IN-BODY", "true");
             return this.Ok(test);
+            //return this.Ok();
         }
     }
 }

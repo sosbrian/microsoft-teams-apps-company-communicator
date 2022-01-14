@@ -27,6 +27,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues
         /// </summary>
         public string RecipientId { get; set; }
 
+        public string Preference { get; set; }
+
         /// <summary>
         /// Gets or sets the user data needed to send a user a notification.
         /// Note: this should be set if the recipient type indicates the recipient is a user.

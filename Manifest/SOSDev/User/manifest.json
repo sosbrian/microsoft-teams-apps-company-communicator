@@ -1,0 +1,42 @@
+{
+  "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.5/MicrosoftTeams.schema.json",
+  "manifestVersion": "1.5",
+  "version": "4.1.3",
+  "id": "148a66bb-e83d-425a-927d-09f4299a9274",
+  "packageName": "com.microsoft.teams.companycommunicator",
+  "developer": {
+    "name": "SOS Group Limted",
+    "websiteUrl": "https://github.com/OfficeDev/microsoft-teams-apps-company-communicator/wiki/Deployment-guide",
+    "privacyUrl": "https://github.com/OfficeDev/microsoft-teams-apps-company-communicator/wiki/Deployment-guide",
+    "termsOfUseUrl": "https://github.com/OfficeDev/microsoft-teams-apps-company-communicator/wiki/Deployment-guide"
+  },
+  "icons": {
+    "color": "color.png",
+    "outline": "outline.png"
+  },
+  "name": {
+    "short": "CC Dev",
+    "full": "CC Dev"
+  },
+  "description": {
+    "short": "Broadcast messages to multiple teams and people in one go",
+    "full": "Broadcasts messages to multiple teams and individuals through channel posts and chat messages"
+  },
+  "accentColor": "#64A2CC",
+  "bots": [{
+    "botId": "13b6c21f-e96e-4585-9150-f5c8fdfe8d29",
+    "scopes": [
+      "personal",
+      "team"
+    ],
+    "supportsFiles": false,
+    "isNotificationOnly": true
+  }],
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "sosdev.ap.ngrok.io"
+  ]
+}

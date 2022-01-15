@@ -65,7 +65,7 @@ class Preference extends React.Component {
                     </Flex>
                     <Flex gap="gap.smaller" vAlign="end" hAlign="center">
                         <PrimaryButton type="submit" value="Submit" text="Submit" />
-                        <Button onClick={test} content="Test"/>
+                        {/*<Button onClick={test} content="Test"/>*/}
                     </Flex>
                 </Flex>
             </div>

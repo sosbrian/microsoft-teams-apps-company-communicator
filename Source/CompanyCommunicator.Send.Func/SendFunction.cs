@@ -212,54 +212,95 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     return;
                 }
 
+                var notificationId = messageContent.NotificationId;
+                var notificationEntity = await this.notificationDataRepository.GetAsync(
+                    NotificationDataTableNames.SentNotificationsPartition,
+                    notificationId); // Testing Check Email Option
+
                 // Send message.
-                var messageActivity = await this.GetMessageActivity(messageContent);
-                var response = await this.messageService.SendMessageAsync(
+                if (!string.IsNullOrWhiteSpace(notificationEntity.SecLanguage) && messageContent.RecipientData.UserData.Preference == notificationEntity.SecLanguage)
+                {
+                    var messageActivity = await this.GetSecMessageActivity(messageContent);
+                    var response = await this.messageService.SendMessageAsync(
                     message: messageActivity,
                     serviceUrl: messageContent.GetServiceUrl(),
                     conversationId: messageContent.GetConversationId(),
                     maxAttempts: this.maxNumberOfAttempts,
                     logger: log);
 
+                    // Process response.
+                    await this.ProcessResponseAsync(messageContent, response, log);
+                }
+                else
+                {
+                    var messageActivity = await this.GetMessageActivity(messageContent);
+                    var response = await this.messageService.SendMessageAsync(
+                    message: messageActivity,
+                    serviceUrl: messageContent.GetServiceUrl(),
+                    conversationId: messageContent.GetConversationId(),
+                    maxAttempts: this.maxNumberOfAttempts,
+                    logger: log);
+
+                    // Process response.
+                    await this.ProcessResponseAsync(messageContent, response, log);
+                }
+
+                //var messageActivity = await this.GetMessageActivity(messageContent);
+                //var response = await this.messageService.SendMessageAsync(
+                //    message: messageActivity,
+                //    serviceUrl: messageContent.GetServiceUrl(),
+                //    conversationId: messageContent.GetConversationId(),
+                //    maxAttempts: this.maxNumberOfAttempts,
+                //    logger: log);
+
                 // Process response.
-                await this.ProcessResponseAsync(messageContent, response, log);
+                //await this.ProcessResponseAsync(messageContent, response, log);
 
                 // Send Adaptive Card to Email.
-                var notificationId = messageContent.NotificationId;
-                var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId); // Testing Check Email Option
                 var recData = messageContent.RecipientData.RecipientId;
-                //var sendMail2User1 = await graphServiceClient.Users["19baaacc-7c87-47f6-a399-77ceb5d28de1"]
-                //.Request()
-                //.Select("userPrincipalName")
-                //.GetAsync();
-                //var message1 = new Message
-                //{
-                //    Subject = "Debug Email",
-                //    Body = new ItemBody
-                //    {
-                //        ContentType = BodyType.Html,
-                //        Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + JsonConvert.SerializeObject(messageActivity) + "</body></html>",
-                //    },
-                //    ToRecipients = new List<Recipient>()
-                //    {
-                //        new Recipient
-                //        {
-                //            EmailAddress = new EmailAddress
-                //            {
-                //                Address = sendMail2User1.UserPrincipalName,
-                //            },
-                //        },
-                //    },
-                //};
 
-                //await graphServiceClient.Users[this.emailSenderAadId]
-                //        .SendMail(message1, false)
-                //        .Request()
-                //        .PostAsync();
+                //Test
+                // var result = string.Empty;
+                // if (messageContent.RecipientData.UserData.Preference == notificationEntity.SecLanguage)
+                // {
+                //     result = "Preference: " + messageContent.RecipientData.UserData.Preference + " " + notificationEntity.SecLanguage + "true";
+                // }
+                // else
+                // {
+                //     result = "Preference: " + messageContent.RecipientData.UserData.Preference + " " + notificationEntity.SecLanguage + "false";
+                // }
+
+                // var sendMail2User1 = await graphServiceClient.Users["19baaacc-7c87-47f6-a399-77ceb5d28de1"]
+                // .Request()
+                // .Select("userPrincipalName")
+                // .GetAsync();
+                // var message1 = new Message
+                // {
+                //     Subject = "Debug Email",
+                //     Body = new ItemBody
+                //     {
+                //         ContentType = BodyType.Html,
+                //         Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + messageContent.RecipientData.Preference + "<br>" + result + "</body></html>",
+                //     },
+                //     ToRecipients = new List<Recipient>()
+                //     {
+                //         new Recipient
+                //         {
+                //             EmailAddress = new EmailAddress
+                //             {
+                //                 Address = sendMail2User1.UserPrincipalName,
+                //             },
+                //         },
+                //     },
+                // };
+
+                // await graphServiceClient.Users[this.emailSenderAadId]
+                //         .SendMail(message1, false)
+                //         .Request()
+                //         .PostAsync();
 
                 if (notificationEntity.EmailOption)
                 {
-                    //string tJson = "{\"type\":\"AdaptiveCard\",\"originator\":\"ae832c7e-ad1e-4fda-9c9d-e9a98ac84dfb\",\"version\":\"1.0\",\"body\":[{\"type\":\"Container\",\"backgroundImage\":{\"url\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAIAAAACUFjqAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAAHYcAAB2HAY/l8WUAAAATSURBVChTY7gs6IoHjUpjQYKuAHs0dAUXB9EuAAAAAElFTkSuQmCC\",\"fillMode\":\"repeat\",\"horizontalAlignment\":\"center\",\"verticalAlignment\":\"center\"},\"items\":[{\"type\":\"TextBlock\",\"size\":\"medium\",\"weight\":\"bolder\",\"color\":\"light\",\"text\":\"Demo\",\"horizontalAlignment\":\"center\"}],\"bleed\":true},{\"type\":\"TextBlock\",\"size\":\"extraLarge\",\"weight\":\"bolder\",\"text\":\"Outlook Client Demo \",\"wrap\":true},{\"type\":\"Image\",\"size\":\"stretch\",\"url\":\"https://i.ytimg.com/vi/rMXAl05wtzQ/maxresdefault.jpg\",\"altText\":\"\"},{\"type\":\"TextBlock\",\"size\":\"medium\",\"weight\":\"bolder\",\"text\":\"Summary Demo\nSummary Demo\nSummary Demo\nSummary Demo\",\"horizontalAlignment\":\"center\",\"wrap\":true,\"fontType\":\"monospace\"},{\"type\":\"TextBlock\",\"size\":\"small\",\"weight\":\"lighter\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.OpenUrl\",\"url\":\"https://office.com\",\"title\":\"Read More\"}]},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.ChoiceSet\",\"id\":\"Reaction\",\"style\":\"expanded\",\"isMultiSelect\":false,\"choices\":[{\"title\":\"Extremely satisfied\",\"value\":\"1\"},{\"title\":\"Somewhat satisfied\",\"value\":\"2\"},{\"title\":\"Neither satisfied nor dissatisfied\",\"value\":\"3\"},{\"title\":\"Somewhat dissatisfied\",\"value\":\"4\"},{\"title\":\"Extremely dissatisfied\",\"value\":\"5\"}]},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.Text\",\"id\":\"FreeTextSurvey\",\"placeholder\":\"Enter Text Here\",\"isMultiline\":true,\"maxLength\":500},{\"type\":\"TextBlock\",\"text\":\"Demo\",\"wrap\":true},{\"type\":\"Input.ChoiceSet\",\"id\":\"YesNo\",\"style\":\"expanded\",\"isMultiSelect\":false,\"choices\":[{\"title\":\"Yes\",\"value\":\"Yes\"},{\"title\":\"No\",\"value\":\"No\"}]},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.Http\",\"method\":\"GET\",\"url\":\"https://chrischow.ap.ngrok.io/api/Survey/Result?notificationId=2517668294588227007&aadid=19baaacc-7c87-47f6-a399-77ceb5d28de1&reaction={{{{Reaction.value}}}}&freetext={{{{FreeTextSurvey.value}}}}&yesno={{{{YesNo.value}}}}\",\"data\":{\"notificationId\":\"2517668294588227007\"},\"title\":\"Submit\"}]},{\"type\":\"ActionSet\",\"actions\":[{\"type\":\"Action.OpenUrl\",\"url\":\"https://office.com\",\"title\":\"Open Survey\"}]}]}";
                     string teamsJson = this.teamsCard.ToJson();
                     string link2Replace = "https://teams.microsoft.com/l/task/" + this.taskModuleAppID + "?url=" + this.appServiceUri + "/player.html?vid=" + notificationEntity.VideoLink + "&height=700&width=1000&title=Video%20Player";
                     string json = this.aCard.ToJson()
@@ -283,7 +324,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         Body = new ItemBody
                         {
                             ContentType = BodyType.Html,
-                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + messageActivity + "</body></html>",
+                            Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br></body></html>",
                             //Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + tJson + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(tJson, Formatting.Indented) + "</body></html>",
                         },
                         ToRecipients = new List<Recipient>()
@@ -392,7 +433,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 NotificationDataTableNames.SendingNotificationsPartition,
                 message.NotificationId);
 
-            var parsedResult = AdaptiveCard.FromJson(notification.Content2);
+            //var checkPreference = await this.notificationDataRepository.GetAsync(
+            //    NotificationDataTableNames.SentNotificationsPartition,
+            //    message.NotificationId); // Testing Check Email Option
+
+            //if (string.IsNullOrWhiteSpace(checkPreference.SecLanguage))
+
+            var parsedResult = AdaptiveCard.FromJson(notification.Content);
             var card = parsedResult.Card;
 
             //var recipentAadid = message.RecipientData.RecipientId;
@@ -409,7 +456,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             //card.Body.Add(pixel);
             this.teamsCard = card;
             this.aCard = card;
-            notification.Content2 = notification.Content2
+            notification.Content = notification.Content
                 .Replace("\\n", "\\n\\r");
             //.Replace($"\"data\":{{\"notificationId\":{message.NotificationId}}}", "\"data\":{\"msteams\":{\"type\":\"task/fetch\"},\"data\":\"Invoke\"}");
             //var cardJson = new AdaptiveTextBlock()
@@ -421,8 +468,32 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             var adaptiveCardAttachment = new Attachment()
             {
                 ContentType = AdaptiveCardContentType,
-                //Content = JsonConvert.DeserializeObject(notification.Content),
-                Content = card,
+                Content = JsonConvert.DeserializeObject(notification.Content),
+                //Content = card,
+            };
+
+            return MessageFactory.Attachment(adaptiveCardAttachment);
+        }
+
+        private async Task<IMessageActivity> GetSecMessageActivity(SendQueueMessageContent message)
+        {
+            var notification = await this.notificationRepo.GetAsync(
+                NotificationDataTableNames.SendingNotificationsPartition,
+                message.NotificationId);
+
+            var parsedResult = AdaptiveCard.FromJson(notification.Content);
+            var card = parsedResult.Card;
+
+            this.teamsCard = card;
+            this.aCard = card;
+            notification.Content2 = notification.Content2
+                .Replace("\\n", "\\n\\r");
+
+            var adaptiveCardAttachment = new Attachment()
+            {
+                ContentType = AdaptiveCardContentType,
+                Content = JsonConvert.DeserializeObject(notification.Content2),
+                //Content = card,
             };
 
             return MessageFactory.Attachment(adaptiveCardAttachment);

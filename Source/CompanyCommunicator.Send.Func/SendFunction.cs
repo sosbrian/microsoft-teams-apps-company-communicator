@@ -228,34 +228,34 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 var notificationId = messageContent.NotificationId;
                 var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId); // Testing Check Email Option
                 var recData = messageContent.RecipientData.RecipientId;
-                var sendMail2User1 = await graphServiceClient.Users["19baaacc-7c87-47f6-a399-77ceb5d28de1"]
-                .Request()
-                .Select("userPrincipalName")
-                .GetAsync();
-                var message1 = new Message
-                {
-                    Subject = "Debug Email",
-                    Body = new ItemBody
-                    {
-                        ContentType = BodyType.Html,
-                        Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + JsonConvert.SerializeObject(messageActivity) + "</body></html>",
-                    },
-                    ToRecipients = new List<Recipient>()
-                    {
-                        new Recipient
-                        {
-                            EmailAddress = new EmailAddress
-                            {
-                                Address = sendMail2User1.UserPrincipalName,
-                            },
-                        },
-                    },
-                };
+                //var sendMail2User1 = await graphServiceClient.Users["19baaacc-7c87-47f6-a399-77ceb5d28de1"]
+                //.Request()
+                //.Select("userPrincipalName")
+                //.GetAsync();
+                //var message1 = new Message
+                //{
+                //    Subject = "Debug Email",
+                //    Body = new ItemBody
+                //    {
+                //        ContentType = BodyType.Html,
+                //        Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + JsonConvert.SerializeObject(messageActivity) + "</body></html>",
+                //    },
+                //    ToRecipients = new List<Recipient>()
+                //    {
+                //        new Recipient
+                //        {
+                //            EmailAddress = new EmailAddress
+                //            {
+                //                Address = sendMail2User1.UserPrincipalName,
+                //            },
+                //        },
+                //    },
+                //};
 
-                await graphServiceClient.Users[this.emailSenderAadId]
-                        .SendMail(message1, false)
-                        .Request()
-                        .PostAsync();
+                //await graphServiceClient.Users[this.emailSenderAadId]
+                //        .SendMail(message1, false)
+                //        .Request()
+                //        .PostAsync();
 
                 if (notificationEntity.EmailOption)
                 {

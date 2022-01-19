@@ -19,5 +19,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets name.
         /// </summary>
         public string Name { get; set; }
+
+        public string AadId { get; set; }
+
+        public string Preference { get; set; }
     }
 }

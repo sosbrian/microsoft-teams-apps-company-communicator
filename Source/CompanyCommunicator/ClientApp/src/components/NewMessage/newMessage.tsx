@@ -29,7 +29,7 @@ import FormatAlignCenterIcon from '@material-ui/icons/FormatAlignCenter';
 import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 import { CSVReader } from 'react-papaparse';
 import Resizer from 'react-image-file-resizer';
-
+import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
 
 type dropdownItem = {
     key: string,
@@ -215,6 +215,7 @@ export interface formState {
     selectedFileName: string,
     exclusionList: string,
     resetCSVReader: boolean,
+    video: any
 }
 
 export interface INewMessageProps extends RouteComponentProps, WithTranslation {
@@ -225,6 +226,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     readonly localize: TFunction;
     private card: any;
     fileInput: any;
+
 
     constructor(props: INewMessageProps) {
         super(props);
@@ -431,6 +433,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         ;
         //this.setDefaultCard(this.card);
         this.state = {
+            video: null,
             template: "",
             senderTemplate: "",
             secSenderTemplate: "",
@@ -532,6 +535,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.fileInput = React.createRef();
         this.handleImageSelection = this.handleImageSelection.bind(this);
         this.handleSecImageSelection = this.handleSecImageSelection.bind(this);
+        this.uploadVideo = this.uploadVideo.bind(this);
+        this.onVideoUpload = this.onVideoUpload.bind(this);
     }
 
     public async componentDidMount() {
@@ -598,89 +603,13 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     //function to handle the secondary language layout
     private selectLanguage = (event: any, itemsData: any) => {
         if(this.state.language === "Primary"){
-            if (itemsData.value === "English") {
-                this.setState({
-                    priLanguage: "English"
-                });
-            } else if (itemsData.value === "Burmese") {
-                this.setState({
-                    priLanguage: "Burmese"
-                });
-            } else if (itemsData.value === "Traditional Chinese") {
-                this.setState({
-                    priLanguage: "Traditional Chinese"
-                });
-            } else if (itemsData.value === "Simplified Chinese") {
-                this.setState({
-                    priLanguage: "Simplified Chinese"
-                });
-            } else if (itemsData.value === "Malay") {
-                this.setState({
-                    priLanguage: "Malay"
-                });
-            } else if (itemsData.value === "Thai") {
-                this.setState({
-                    priLanguage: "Thai"
-                });
-            } else if (itemsData.value === "Filipino") {
-                this.setState({
-                    priLanguage: "Filipino"
-                });
-            } else if (itemsData.value === "Indonesian") {
-                this.setState({
-                    priLanguage: "Indonesian"
-                });
-            } else if (itemsData.value === "Korea") {
-                this.setState({
-                    priLanguage: "Korea"
-                });
-            } else if (itemsData.value === "Vietnamese") {
-                this.setState({
-                    priLanguage: "Vietnamese"
-                });
-            }
+            this.setState({
+                priLanguage: itemsData.value
+            });
         } else if (this.state.language === "Secondary") {
-            if (itemsData.value === "English") {
-                this.setState({
-                    secLanguage: "English"
-                });
-            } else if (itemsData.value === "Burmese") {
-                this.setState({
-                    secLanguage: "Burmese"
-                });
-            } else if (itemsData.value === "Traditional Chinese") {
-                this.setState({
-                    secLanguage: "Traditional Chinese"
-                });
-            } else if (itemsData.value === "Simplified Chinese") {
-                this.setState({
-                    secLanguage: "Simplified Chinese"
-                });
-            } else if (itemsData.value === "Malay") {
-                this.setState({
-                    secLanguage: "Malay"
-                });
-            } else if (itemsData.value === "Thai") {
-                this.setState({
-                    secLanguage: "Thai"
-                });
-            } else if (itemsData.value === "Filipino") {
-                this.setState({
-                    secLanguage: "Filipino"
-                });
-            } else if (itemsData.value === "Indonesian") {
-                this.setState({
-                    secLanguage: "Indonesian"
-                });
-            } else if (itemsData.value === "Korea") {
-                this.setState({
-                    secLanguage: "Korea"
-                });
-            } else if (itemsData.value === "Vietnamese") {
-                this.setState({
-                    secLanguage: "Vietnamese"
-                });
-            }
+            this.setState({
+                secLanguage: itemsData.value
+            });
         }
     }
 
@@ -1476,6 +1405,47 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         }
     }
 
+    private onVideoUpload = (event: any) => {
+        //console.log(event.target);
+        this.setState({
+            video: event.target.files[0]
+        }, () => {
+
+        });
+    }
+
+    private uploadVideo = async() => {
+        let storageAccountName = "45u3yv4vigkqc";
+        let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2022-01-21T10:03:35Z&st=2022-01-19T02:03:35Z&spr=https&sig=h%2Frncoc%2F65mhdwxhwKUamZmJcAkV%2F18R%2F7cMSDm0o%2FU%3D";
+        const blobService = new BlobServiceClient(
+            `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
+        );
+
+        const containerClient = blobService.getContainerClient('files');
+        await containerClient.createIfNotExists({
+            access: 'container',
+        });
+
+        const blobClient = containerClient.getBlockBlobClient(this.state.video.name);
+
+        // blobClient.catch((error) => {
+        //     return error;
+        // });
+
+        const options = { blobHTTPHeaders: { blobContentType: this.state.video.type }};
+
+        await blobClient.uploadBrowserData(this.state.video, options);
+
+        // let blobUrl = blobClient.Uri.AbsoluteUri;
+        let blobUrl = blobClient.url;
+        console.log(blobUrl);
+        this.setState({
+            imageLink: blobUrl
+        }, () => {
+            this.onImageLinkChanged();
+        })
+    }
+
     private printCon = (e: any) => {
         console.log("Pri: " + this.state.priLanguage)
         console.log("Sec: " + this.state.secLanguage)
@@ -1765,6 +1735,13 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                     {/*    onChange={this.switchLanguage}*/}
                                                     {/*    checkable*/}
                                                     {/*/>*/}
+                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
+                                                        <input onChange={this.onVideoUpload} type="file"/>
+                                                        <Button 
+                                                            onClick={this.uploadVideo} 
+                                                            content={this.localize("Upload")}
+                                                        />
+                                                    </Flex>
                                                     <Flex gap="gap.smaller" vAlign="end" className="inputField">
                                                         <Button
                                                             onClick={this.switchLanguage}
@@ -5051,7 +5028,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             secLinkToSurvey: this.state.secLinkToSurvey,
             teams: selectedTeams,
             rosters: selctedRosters,
-            //rosters: ["19:e0dRe1TRSqFur-yWALdrniodjxblg_TeTb-L6Bn0kXQ1@thread.tacv2"],
             groups: selectedGroups,
             uploadedList: this.state.uploadedList,
             uploadedListName: this.state.uploadedListName,

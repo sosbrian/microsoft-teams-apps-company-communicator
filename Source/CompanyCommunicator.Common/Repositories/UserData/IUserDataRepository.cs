@@ -5,6 +5,7 @@
 
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     /// <summary>
@@ -24,5 +25,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
         /// <param name="deltaLink">delta link.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public Task SetDeltaLinkAsync(string deltaLink);
+
+        public Task<IEnumerable<UserDataEntity>> GetSortedUserAsync();
+
+        public Task<IEnumerable<UserDataEntity>> GetUserDataEntitiesByIdsAsync(IEnumerable<string> userIds);
     }
 }

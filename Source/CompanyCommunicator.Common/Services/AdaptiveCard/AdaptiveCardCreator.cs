@@ -702,7 +702,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard
                 });
             }
 
-            if (!string.IsNullOrWhiteSpace(secBoldSummary))
+            if (!string.IsNullOrWhiteSpace(secSummary))
             {
                 if (secBoldSummary == "Bold")
                 { secSummarybold = AdaptiveTextWeight.Bolder; }

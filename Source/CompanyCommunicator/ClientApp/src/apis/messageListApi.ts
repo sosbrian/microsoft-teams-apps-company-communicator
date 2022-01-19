@@ -93,7 +93,13 @@ export const getAuthenticationConsentMetadata = async (windowLocationOriginDomai
     return await axios.get(url, undefined, false);
 }
 
-export const getUsers = async (): Promise<any> => {
-    let url = baseAxiosUrl + "/userdata";
+export const getUsers = async (id: string): Promise<any> => {
+    let url = baseAxiosUrl + "/user/" + id;
+    //console.log(url);
     return await axios.get(url);
+}
+
+export const updateUserPreference = async (payload: {}): Promise<any> => {
+    let url = baseAxiosUrl + "/user";
+    return await axios.put(url, payload);
 }

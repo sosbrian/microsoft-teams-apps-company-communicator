@@ -361,3 +361,5 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Manifest/CCLocalUser/1857.zip
+/Manifest/CCLocalUser/1952.zip

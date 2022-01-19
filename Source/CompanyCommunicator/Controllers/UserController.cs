@@ -13,7 +13,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Graph;
     using Microsoft.Teams.Apps.CompanyCommunicator.Authentication;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MicrosoftGraph;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Models;
+    using Microsoft.Bot.Schema;
 
     /// <summary>
     /// Controller for the user data.
@@ -22,38 +24,75 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     //[Authorize(PolicyNames.MustBeValidUpnPolicy)]
     public class UserController : ControllerBase
     {
-        private readonly IUsersService usersService;
+        private readonly IUserDataRepository userDataRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
         /// </summary>
-        /// <param name="usersService">Team data repository instance.</param>
-        //public UserController(IUsersService usersService)
-        //{
-        //    this.usersService = usersService ?? throw new ArgumentNullException(nameof(usersService));
-        //}
+        /// <param name="userDataRepository">Team data repository instance.</param>
+        public UserController(IUserDataRepository userDataRepository)
+        {
+           this.userDataRepository = userDataRepository ?? throw new ArgumentNullException(nameof(userDataRepository));
+        }
 
         /// <summary>
         /// Get data for all teams.
         /// </summary>
         /// <returns>A list of team data.</returns>
-        [HttpGet]
-        public async Task<IEnumerable<UserData>> GetAllUserDataAsync()
-        {
-            (IEnumerable<User>, string) tuple = (new List<User>(), string.Empty);
-            tuple = await this.usersService.GetAllUsersAsync();
-            var users = new List<UserData>();
-            foreach (var entity in tuple.Item1)
+        [HttpGet("{id}")]
+        public async Task<IEnumerable<UserDataEntity>> GetAllUsersDataAsync(IEnumerable<string> id) {
+            var entities = await this.userDataRepository.GetUserDataEntitiesByIdsAsync(id);
+            var result = new List<UserDataEntity>();
+            foreach (var entity in entities)
             {
-                var user = new UserData
+                var user = new UserDataEntity
                 {
-                    Id = entity.Id,
-                    Name = entity.DisplayName,
+                    PartitionKey = entity.PartitionKey,
+                    RowKey = entity.RowKey,
+                    AadId = entity.AadId,
+                    UserId = entity.UserId,
+                    ConversationId = entity.ConversationId,
+                    ServiceUrl = entity.ServiceUrl,
+                    TenantId = entity.TenantId,
+                    Preference = entity.Preference,
+                    UserType = entity.UserType,
                 };
-                users.Add(user);
+                result.Add(user);
             }
 
-            return users;
+            return result;
+        }
+
+        // [HttpPost("update")]
+        [HttpPut]
+        public async Task<IActionResult> UpdateUserPreferenceAsync([FromBody] UserDataEntity userData)
+        {
+            if (userData == null)
+            {
+                throw new ArgumentNullException(nameof(userData));
+            }
+
+            var userDataEntity = new UserDataEntity
+            {
+                PartitionKey = userData.PartitionKey,
+                RowKey = userData.RowKey,
+                AadId = userData.AadId,
+                UserId = userData.UserId,
+                ConversationId = userData.ConversationId,
+                ServiceUrl = userData.ServiceUrl,
+                TenantId = userData.TenantId,
+                Preference = userData.Preference,
+                UserType = userData.UserType,
+            };
+
+            //{
+            //    PartitionKey = UserDataTableNames.UserDataPartition,
+            //    RowKey = userData.AadId,
+            //    Preference = userData.Preference,
+            //};
+
+            await this.userDataRepository.InsertOrMergeAsync(userDataEntity);
+            return this.Ok();
         }
     }
 }

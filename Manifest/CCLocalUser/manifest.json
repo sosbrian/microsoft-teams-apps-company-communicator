@@ -23,6 +23,15 @@
     "full": "Broadcasts messages to multiple teams and individuals through channel posts and chat messages"
   },
   "accentColor": "#64A2CC",
+  "staticTabs": [{
+	"entityId": "personalPreference",
+	"name": "Preference",
+	"contentUrl": "https://chrischow.ap.ngrok.io/preference",
+	"scopes": [
+	  "personal",
+	  "team"
+	]
+  }],
   "bots": [{
     "botId": "14681553-65ce-499e-bd09-34fdbd435753",
     "scopes": [
@@ -38,5 +47,9 @@
   ],
   "validDomains": [
     "chrischow.ap.ngrok.io"
-  ]
+  ],
+  "webApplicationInfo": {
+    "id": "14681553-65ce-499e-bd09-34fdbd435753",
+    "resource": "api://chrischow.ap.ngrok.io/14681553-65ce-499e-bd09-34fdbd435753"
+  }
 }

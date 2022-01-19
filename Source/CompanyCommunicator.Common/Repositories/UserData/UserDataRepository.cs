@@ -5,6 +5,8 @@
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Extensions.Logging;
@@ -74,6 +76,40 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
                 this.Logger.LogError(ex, ex.Message);
                 throw;
             }
+        }
+
+        /// <inheritdoc/>
+        // public async Task<IEnumerable<string>> GetUserPreferenceByIdsAsync(IEnumerable<string> ids)
+        public async Task<IEnumerable<UserDataEntity>> GetSortedUserAsync()
+        {
+            var userDataEntities = await this.GetAllAsync();
+            var sortedSet = new SortedSet<UserDataEntity>(userDataEntities, new UserDataEntityComparer());
+            return sortedSet;
+            // if (ids == null || !ids.Any())
+            // {
+            //     return new List<string>();
+            // }
+
+            // var rowKeysFilter = this.GetRowKeysFilter(ids);
+            // var userDataEntities = await this.GetWithFilterAsync(rowKeysFilter);
+
+            // return userDataEntities.Select(p => p.Name).OrderBy(p => p);
+        }
+
+        private class UserDataEntityComparer : IComparer<UserDataEntity>
+        {
+            public int Compare(UserDataEntity x, UserDataEntity y)
+            {
+                return x.AadId.CompareTo(y.AadId);
+            }
+        }
+
+        /// <inheritdoc/>
+        public async Task<IEnumerable<UserDataEntity>> GetUserDataEntitiesByIdsAsync(IEnumerable<string> userIds)
+        {
+            var rowKeysFilter = this.GetRowKeysFilter(userIds);
+
+            return await this.GetWithFilterAsync(rowKeysFilter);
         }
     }
 }

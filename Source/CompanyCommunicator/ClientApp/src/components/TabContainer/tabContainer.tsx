@@ -94,26 +94,6 @@ class TabContainer extends React.Component<ITaskInfoProps, ITabContainerState> {
             </Flex>
         );
     }
-    //Test Task Module
-    private appRoot(): string {
-        if (typeof window === "undefined") {
-            return "https://";
-        } else {
-            return window.location.protocol + "//" + window.location.host;
-        }
-    }
-    
-    private onShowVideo = () => {
-        const taskModuleInfo = {
-            title: "YouTube Player",
-            //url: this.appRoot() + `/player.html?vid=$ovQLlaok7Hs`,
-            url: this.appRoot() + `/player.html?vid=OhFsua8pjjA`,
-            width: 1000,
-            height: 700
-        };
-        console.log(this.appRoot());
-        microsoftTeams.tasks.startTask(taskModuleInfo);
-    }
 
     public onNewMessage = () => {
         let taskInfo: ITaskInfo = {

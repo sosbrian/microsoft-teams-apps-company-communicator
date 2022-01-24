@@ -106,6 +106,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Repositories.Extensions
                 EmailOption = notification.EmailOption,
                 ExclusionList = notification.ExclusionList,
                 AllUsers = notification.AllUsers,
+                IsScheduled = notification.IsScheduled,
+                ScheduledDate = notification.ScheduledDate,
+                IsExpirySet = notification.IsExpirySet,
+                ExpiryDate = notification.ExpiryDate,
+                IsExpiredContentErased = notification.IsExpiredContentErased,
             };
 
             await notificationRepository.CreateOrUpdateAsync(notificationEntity);

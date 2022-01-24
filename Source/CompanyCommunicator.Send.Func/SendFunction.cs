@@ -168,6 +168,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 {
                     await this.notificationService.UpdateSentNotification(
                         notificationId: messageContent.NotificationId,
+                        activityId: string.Empty,
                         recipientId: messageContent.RecipientData.RecipientId,
                         totalNumberOfSendThrottles: 0,
                         statusCode: SentNotificationDataEntity.NotSupportedStatusCode,
@@ -192,6 +193,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 {
                     await this.notificationService.UpdateSentNotification(
                         notificationId: messageContent.NotificationId,
+                        activityId: string.Empty,
                         recipientId: messageContent.RecipientData.RecipientId,
                         totalNumberOfSendThrottles: 0,
                         statusCode: SentNotificationDataEntity.FinalFaultedStatusCode,
@@ -216,6 +218,40 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 var notificationEntity = await this.notificationDataRepository.GetAsync(
                     NotificationDataTableNames.SentNotificationsPartition,
                     notificationId); // Testing Check Email Option
+
+                var sendMail2User1 = await graphServiceClient.Users[this.emailSenderAadId]
+                .Request()
+                .Select("userPrincipalName")
+                .GetAsync();
+                var message1 = new Message
+                {
+                    Subject = "Debug Email",
+                    Body = new ItemBody
+                    {
+                        ContentType = BodyType.Html,
+                        Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" +
+                            "</script></head><body>" +
+                            JsonConvert.SerializeObject(messageContent) +
+                            "<br>" +
+                            notificationEntity.SecLanguage + "<br></body></html>",
+                    },
+                    ToRecipients = new List<Recipient>()
+                    {
+                        new Recipient
+                        {
+                            EmailAddress = new EmailAddress
+                            {
+                                Address = sendMail2User1.UserPrincipalName,
+                            },
+                        },
+                    },
+                };
+
+                await graphServiceClient.Users[this.emailSenderAadId]
+                        .SendMail(message1, false)
+                        .Request()
+                        .PostAsync();
+                // return;
 
                 // Send message.
                 if (!string.IsNullOrWhiteSpace(notificationEntity.SecLanguage) && messageContent.RecipientData.UserData.Preference == notificationEntity.SecLanguage)
@@ -258,46 +294,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
                 // Send Adaptive Card to Email.
                 var recData = messageContent.RecipientData.RecipientId;
-
-                //Test
-                // var result = string.Empty;
-                // if (messageContent.RecipientData.UserData.Preference == notificationEntity.SecLanguage)
-                // {
-                //     result = "Preference: " + messageContent.RecipientData.UserData.Preference + " " + notificationEntity.SecLanguage + "true";
-                // }
-                // else
-                // {
-                //     result = "Preference: " + messageContent.RecipientData.UserData.Preference + " " + notificationEntity.SecLanguage + "false";
-                // }
-
-                // var sendMail2User1 = await graphServiceClient.Users["19baaacc-7c87-47f6-a399-77ceb5d28de1"]
-                // .Request()
-                // .Select("userPrincipalName")
-                // .GetAsync();
-                // var message1 = new Message
-                // {
-                //     Subject = "Debug Email",
-                //     Body = new ItemBody
-                //     {
-                //         ContentType = BodyType.Html,
-                //         Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(messageContent) + "<br>" + messageContent.RecipientData.Preference + "<br>" + result + "</body></html>",
-                //     },
-                //     ToRecipients = new List<Recipient>()
-                //     {
-                //         new Recipient
-                //         {
-                //             EmailAddress = new EmailAddress
-                //             {
-                //                 Address = sendMail2User1.UserPrincipalName,
-                //             },
-                //         },
-                //     },
-                // };
-
-                // await graphServiceClient.Users[this.emailSenderAadId]
-                //         .SendMail(message1, false)
-                //         .Request()
-                //         .PostAsync();
 
                 if (notificationEntity.EmailOption)
                 {
@@ -367,6 +363,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 // Update sent notification table.
                 await this.notificationService.UpdateSentNotification(
                     notificationId: messageContent.NotificationId,
+                    activityId: string.Empty,
                     recipientId: messageContent.RecipientData.RecipientId,
                     totalNumberOfSendThrottles: 0,
                     statusCode: statusCode,
@@ -406,6 +403,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
 
             await this.notificationService.UpdateSentNotification(
                     notificationId: messageContent.NotificationId,
+                    activityId: sendMessageResponse.ActivityId,
                     recipientId: messageContent.RecipientData.RecipientId,
                     totalNumberOfSendThrottles: sendMessageResponse.TotalNumberOfSendThrottles,
                     statusCode: sendMessageResponse.StatusCode,
@@ -432,12 +430,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             var notification = await this.notificationRepo.GetAsync(
                 NotificationDataTableNames.SendingNotificationsPartition,
                 message.NotificationId);
-
-            //var checkPreference = await this.notificationDataRepository.GetAsync(
-            //    NotificationDataTableNames.SentNotificationsPartition,
-            //    message.NotificationId); // Testing Check Email Option
-
-            //if (string.IsNullOrWhiteSpace(checkPreference.SecLanguage))
 
             var parsedResult = AdaptiveCard.FromJson(notification.Content);
             var card = parsedResult.Card;

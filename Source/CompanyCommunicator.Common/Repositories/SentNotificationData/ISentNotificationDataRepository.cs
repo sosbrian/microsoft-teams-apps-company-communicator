@@ -20,5 +20,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         public Task EnsureSentNotificationDataTableExistsAsync();
+
+        public Task UpdateSentNotificationCardAsync(string notificationId);
     }
 }

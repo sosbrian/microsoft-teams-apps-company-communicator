@@ -7,6 +7,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
 
     /// <summary>
@@ -34,6 +35,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                .ConfigureWebHostDefaults(webBuilder =>
                {
                    webBuilder.UseStartup<Startup>();
+               })
+               .ConfigureServices(services =>
+               {
+                   services.AddHostedService<SendMessageScheduler>();
+                   services.AddHostedService<ExpiredMessageScheduler>();
                });
     }
 }

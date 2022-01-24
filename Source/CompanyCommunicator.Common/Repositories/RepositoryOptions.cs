@@ -26,6 +26,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories
         public string StorageAccountConnectionString { get; set; }
 
         /// <summary>
+        /// Gets or sets the SasToken.
+        /// </summary>
+        public string SasToken { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether the table should be created
         /// if it does not already exist.
         /// </summary>

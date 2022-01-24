@@ -41,11 +41,15 @@ export const getSentNotification = async (id: number): Promise<any> => {
     return await axios.get(url);
 }
 
+export const getScheduledNotifications = async (): Promise<any> => {
+    let url = baseAxiosUrl + "/draftnotifications/scheduled";
+    return await axios.get(url);
+}
+
 export const getDraftNotification = async (id: number): Promise<any> => {
     let url = baseAxiosUrl + "/draftnotifications/" + id;
     return await axios.get(url);
 }
-
 
 export const deleteDraftNotification = async (id: number): Promise<any> => {
     let url = baseAxiosUrl + "/draftnotifications/" + id;

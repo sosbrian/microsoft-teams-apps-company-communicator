@@ -83,5 +83,18 @@
   "ExportErrorMessage": "请再次尝试导出结果。如果问题仍然存在，请与你的 IT 管理员联系以获得帮助。",
   "ExportButtonText": "导出详细结果",
   "ExportButtonProgressText": "正在导出",
-  "ErrorURLMessage": "URL 必须以 https:// 开头"
+  "ErrorURLMessage": "URL 必须以 https:// 开头",
+  "UploadImage": "Upload",
+  "FutureDateError": "You need to schedule at least 30 minutes in the future.",
+  "ScheduledSend": "计划发送",
+  "ScheduledMessagesSectionTitle": "Scheduled messages",
+  "EmptyScheduledMessages": "您没有计划的消息。",
+  "SendNow": "Send Now",
+  "ScheduledDate": "Scheduled to",
+  "Important": "Important Message",
+  "ImportantDescription": "This option flags the message as important. Recipients will receive the message and be notified with a Teams alert.",
+  "ScheduledSendDescription": "Select a date and time to schedule your message. Please schedule at least 30 minutes in the future.",
+  "ExpirySendDescription": "Select a date and time to expire your message. Please schedule at least 30 minutes in the future.",
+  "ExpirySend": "到期",
+  "ExpiryDate": "Will be expired on"
 }

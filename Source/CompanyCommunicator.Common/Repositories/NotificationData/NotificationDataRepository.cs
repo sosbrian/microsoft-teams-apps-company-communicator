@@ -8,14 +8,18 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
+    using Microsoft.Azure.Cosmos.Table;
     using Microsoft.Extensions.Logging;
     using Microsoft.Extensions.Options;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
 
     /// <summary>
     /// Repository of the notification data in the table storage.
     /// </summary>
     public class NotificationDataRepository : BaseRepository<NotificationDataEntity>, INotificationDataRepository
     {
+        private readonly ISentNotificationDataRepository sentNotificationDataRepository;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="NotificationDataRepository"/> class.
         /// </summary>
@@ -42,7 +46,59 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// <inheritdoc/>
         public async Task<IEnumerable<NotificationDataEntity>> GetAllDraftNotificationsAsync()
         {
-            var result = await this.GetAllAsync(NotificationDataTableNames.DraftNotificationsPartition);
+            string strFilter = TableQuery.GenerateFilterConditionForBool("IsScheduled", QueryComparisons.Equal, false);
+            var result = await this.GetWithFilterAsync(strFilter, NotificationDataTableNames.DraftNotificationsPartition);
+
+            return result;
+        }
+
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllScheduledNotificationsAsync()
+        {
+            string strFilter = TableQuery.GenerateFilterConditionForBool("IsScheduled", QueryComparisons.Equal, true);
+            var result = await this.GetWithFilterAsync(strFilter, NotificationDataTableNames.DraftNotificationsPartition);
+
+            return result;
+        }
+
+        public async Task<IEnumerable<NotificationDataEntity>> GetAllPendingScheduledNotificationsAsync()
+        {
+            DateTime now = DateTime.UtcNow;
+
+            string filter1 = TableQuery.GenerateFilterConditionForBool("IsScheduled", QueryComparisons.Equal, true);
+            string filter2 = TableQuery.GenerateFilterConditionForDate("ScheduledDate", QueryComparisons.LessThanOrEqual, now);
+            string filter = TableQuery.CombineFilters(filter1, TableOperators.And, filter2);
+
+            var result = await this.GetWithFilterAsync(filter, NotificationDataTableNames.DraftNotificationsPartition);
+
+            return result;
+        }
+
+        public async Task<IEnumerable<NotificationDataEntity>> GetNonErasedExpiredNotificationsAsync()
+        {
+            DateTime now = DateTime.UtcNow;
+            DateTime pastOneDay = DateTime.UtcNow.AddHours(-24);
+
+
+            string filter1 = TableQuery.GenerateFilterConditionForBool("IsExpiredContentErased", QueryComparisons.NotEqual, true);
+            string filter2 = TableQuery.GenerateFilterConditionForDate("ExpiryDate", QueryComparisons.LessThanOrEqual, now);
+            string filterA = TableQuery.CombineFilters(filter1, TableOperators.And, filter2);
+
+            string filterB = TableQuery.GenerateFilterConditionForBool("IsExpirySet", QueryComparisons.Equal, true);
+
+            string filterC = TableQuery.CombineFilters(filterA, TableOperators.And, filterB);
+
+            string filter5 = TableQuery.GenerateFilterConditionForDate("ExpiryDate", QueryComparisons.LessThanOrEqual, now);
+            string filter6 = TableQuery.GenerateFilterConditionForDate("ExpiryDate", QueryComparisons.GreaterThanOrEqual, pastOneDay);
+
+            string filterD = TableQuery.CombineFilters(filter5, TableOperators.And, filter6);
+
+            string filter9 = TableQuery.GenerateFilterConditionForBool("IsExpirySet", QueryComparisons.Equal, true);
+
+            string filterE = TableQuery.CombineFilters(filterD, TableOperators.And, filter9);
+
+            string filterFinal = TableQuery.CombineFilters(filterC, TableOperators.Or, filterE);
+
+            var result = await this.GetWithFilterAsync(filterFinal, NotificationDataTableNames.SentNotificationsPartition);
 
             return result;
         }
@@ -136,6 +192,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     SecLinkToSurvey = draftNotificationEntity.SecLinkToSurvey,
                     CreatedBy = draftNotificationEntity.CreatedBy,
                     CreatedDate = draftNotificationEntity.CreatedDate,
+                    IsScheduled = draftNotificationEntity.IsScheduled,
+                    ScheduledDate = draftNotificationEntity.ScheduledDate,
+                    IsExpirySet = draftNotificationEntity.IsExpirySet,
+                    ExpiryDate = draftNotificationEntity.ExpiryDate,
+                    IsExpiredContentErased = draftNotificationEntity.IsExpiredContentErased,
                     SentDate = null,
                     IsDraft = false,
                     Teams = draftNotificationEntity.Teams,
@@ -246,6 +307,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                     SecLinkToSurvey = notificationEntity.SecLinkToSurvey,
                     CreatedBy = createdBy,
                     CreatedDate = DateTime.UtcNow,
+                    IsScheduled = false,
+                    ScheduledDate = null,
+                    IsExpirySet = false,
+                    ExpiryDate = null,
+                    IsExpiredContentErased = false,
                     IsDraft = true,
                     Teams = notificationEntity.Teams,
                     Groups = notificationEntity.Groups,
@@ -264,6 +330,22 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
                 this.Logger.LogError(ex, ex.Message);
                 throw;
             }
+        }
+
+        /// <inheritdoc/>
+        public async Task UpdateExpiredNotificationAsync(string notificationId)
+        {
+            var notificationDataEntity = await this.GetAsync(
+                NotificationDataTableNames.SentNotificationsPartition,
+                notificationId);
+
+            if (notificationDataEntity != null)
+            {
+                notificationDataEntity.IsExpiredContentErased = true;
+
+                await this.CreateOrUpdateAsync(notificationDataEntity);
+            }
+
         }
 
         /// <inheritdoc/>

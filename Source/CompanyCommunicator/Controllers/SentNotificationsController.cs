@@ -289,6 +289,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 WarningMessage = notificationEntity.WarningMessage,
                 CanDownload = userNotificationDownload == null,
                 SendingCompleted = notificationEntity.IsCompleted(),
+                IsScheduled = notificationEntity.IsScheduled,
+                ScheduledDate = notificationEntity.ScheduledDate,
+                IsExpirySet = notificationEntity.IsExpirySet,
+                ExpiryDate = notificationEntity.ExpiryDate,
+                IsExpiredContentErased = notificationEntity.IsExpiredContentErased,
             };
 
             return this.Ok(result);

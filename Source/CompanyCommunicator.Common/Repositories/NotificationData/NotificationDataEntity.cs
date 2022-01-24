@@ -352,6 +352,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         public bool IsDraft { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the notification is scheduled.
+        /// </summary>
+        public bool IsScheduled { get; set; }
+
+        /// <summary>
         /// Gets or sets the TeamsInString value.
         /// This property helps to save the Teams data in the Azure Table storage.
         /// Table storage doesn't support an array type of the property directly
@@ -492,6 +497,26 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.Notificat
         /// Gets or sets the DateTime the notification's was queued to be sent.
         /// </summary>
         public DateTime? SendingStartedDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the DateTime the notification's was scheduled to be sent.
+        /// </summary>
+        public DateTime? ScheduledDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the expiry date is set.
+        /// </summary>
+        public bool IsExpirySet { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Expiry DateTime the notification if it is was scheduled to be sent.
+        /// </summary>
+        public DateTime? ExpiryDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the expired content is erased.
+        /// </summary>
+        public bool IsExpiredContentErased { get; set; }
 
         /// <summary>
         /// Gets or sets the error message for the notification if there was a failure in

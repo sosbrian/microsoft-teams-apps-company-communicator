@@ -1,17 +1,17 @@
-// Copyright (c) Microsoft Corporation.
+﻿// <copyright file="ScheduledMessages.tsx" company="Microsoft Corporation">
+// Copyright (c) Microsoft.
 // Licensed under the MIT License.
+// </copyright>
 
 import * as React from 'react';
 import { connect } from 'react-redux';
 import { withTranslation, WithTranslation } from "react-i18next";
-import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
+import { initializeIcons } from 'office-ui-fabric-react';
 import { Loader, List, Flex, Text } from '@fluentui/react-northstar';
 import * as microsoftTeams from "@microsoft/teams-js";
-
-import './draftMessages.scss';
-import { selectMessage, getDraftMessagesList, getScheduledMessagesList, getMessagesList } from '../../actions';
+import { selectMessage, getScheduledMessagesList, getDraftMessagesList, getMessagesList } from '../../actions';
 import { getBaseUrl } from '../../configVariables';
-import Overflow from '../OverFlow/draftMessageOverflow';
+import Overflow from '../OverFlow/scheduledMessageOverflow';
 import { TFunction } from "i18next";
 
 export interface ITaskInfo {
@@ -19,7 +19,7 @@ export interface ITaskInfo {
     height?: number;
     width?: number;
     url?: string;
-    card?: string;
+    card?: string; 
     fallbackUrl?: string;
     completionBotId?: string;
 }
@@ -27,7 +27,7 @@ export interface ITaskInfo {
 export interface IMessage {
     id: string;
     title: string;
-    date: string;
+    scheduledDate: string;
     recipients: string;
     acknowledgements?: string;
     reactions?: string;
@@ -51,7 +51,7 @@ export interface IMessageState {
     teamsChannelId?: string;
 }
 
-class DraftMessages extends React.Component<IMessageProps, IMessageState> {
+class ScheduledMessages extends React.Component<IMessageProps, IMessageState> {
     readonly localize: TFunction;
     private interval: any;
     private isOpenTaskModuleAllowed: boolean;
@@ -63,7 +63,9 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
         this.isOpenTaskModuleAllowed = true;
         this.state = {
             message: props.messages,
-            itemsAccount: this.props.messages.length,
+            // itemsAccount: this.props.messages.length,
+            //XXX itemsAccount: this.state.message.length,
+            itemsAccount: this.props.messages ? this.props.messages.length : 0,
             loader: true,
             teamsTeamId: "",
             teamsChannelId: "",
@@ -78,17 +80,20 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
                 teamsChannelId: context.channelId,
             });
         });
-        this.props.getDraftMessagesList();
+
+        this.props.getScheduledMessagesList();
         this.interval = setInterval(() => {
-            this.props.getDraftMessagesList();
+            this.props.getScheduledMessagesList();
         }, 60000);
     }
 
     public componentWillReceiveProps(nextProps: any) {
-        this.setState({
-            message: nextProps.messages,
-            loader: false
-        })
+        if (this.props !== nextProps) {
+            this.setState({
+                message: nextProps.messages,
+                loader: false
+            });
+        }
     }
 
     public componentWillUnmount() {
@@ -103,8 +108,14 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
                 key: keyCount,
                 content: (
                     <Flex vAlign="center" fill gap="gap.small">
-                        <Flex.Item shrink={0} grow={1}>
+                        <Flex.Item grow={1} >
                             <Text>{message.title}</Text>
+                        </Flex.Item>
+                        <Flex.Item push size="24%" shrink={0}>
+                            <Text
+                                truncated
+                                className="semiBold"
+                                content={message.scheduledDate} />
                         </Flex.Item>
                         <Flex.Item shrink={0} align="end">
                             <Overflow message={message} title="" />
@@ -121,19 +132,20 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
         };
 
         const label = this.processLabels();
-        const outList = this.state.message.map(processItem);
-        const allDraftMessages = [...label, ...outList];
+        // const outList = this.state.message.map(processItem);
+        const outList = this.state.message ? this.state.message.map(processItem) : [];
+        const allScheduledMessages = [...label, ...outList];
 
         if (this.state.loader) {
             return (
                 <Loader />
             );
         } else if (this.state.message.length === 0) {
-            return (<div className="results">{this.localize("EmptyDraftMessages")}</div>);
+            return (<div className="results">{this.localize("EmptyScheduledMessages")}</div>);
         }
         else {
             return (
-                <List selectable items={allDraftMessages} className="list" />
+                <List selectable items={allScheduledMessages} className="list" />
             );
         }
     }
@@ -143,13 +155,24 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
             key: "labels",
             content: (
                 <Flex vAlign="center" fill gap="gap.small">
-                    <Flex.Item>
+                    <Flex.Item grow={1} >
                         <Text
                             truncated
                             weight="bold"
                             content={this.localize("TitleText")}
                         >
                         </Text>
+                    </Flex.Item>
+                    <Flex.Item push size="24%" shrink={0}>
+                        <Text
+                            truncated
+                            content={this.localize("Scheduled Date")}
+                            weight="bold"
+                        >
+                        </Text>
+                    </Flex.Item>
+                    <Flex.Item shrink={0} align="end">
+                        <Overflow message="" />
                     </Flex.Item>
                 </Flex>
             ),
@@ -170,8 +193,8 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
             }
 
             let submitHandler = (err: any, result: any) => {
-                this.props.getDraftMessagesList().then(() => {
-                    this.props.getScheduledMessagesList();
+                this.props.getScheduledMessagesList().then(() => {
+                    this.props.getDraftMessagesList();
                     this.props.getMessagesList();
                     this.isOpenTaskModuleAllowed = true;
                 });
@@ -183,8 +206,8 @@ class DraftMessages extends React.Component<IMessageProps, IMessageState> {
 }
 
 const mapStateToProps = (state: any) => {
-    return { messages: state.draftMessagesList, selectedMessage: state.selectedMessage };
+    return { messages: state.scheduledMessagesList, selectedMessage: state.selectedMessage };
 }
 
-const draftMessagesWithTranslation = withTranslation()(DraftMessages);
-export default connect(mapStateToProps, { selectMessage, getDraftMessagesList, getScheduledMessagesList, getMessagesList })(draftMessagesWithTranslation);
+const ScheduledMessagesWithTranslation = withTranslation()(ScheduledMessages);
+export default connect(mapStateToProps, { selectMessage, getScheduledMessagesList, getDraftMessagesList, getMessagesList })(ScheduledMessagesWithTranslation);

@@ -6,7 +6,7 @@ import { RouteComponentProps } from 'react-router-dom';
 import { withTranslation, WithTranslation } from "react-i18next";
 import { initializeIcons } from 'office-ui-fabric-react/lib/Icons';
 import * as AdaptiveCards from "adaptivecards";
-import { Button, Loader, Dropdown, Text, Flex, Input, TextArea, RadioGroup, FlexItem } from '@fluentui/react-northstar'
+import { Button, Loader, Dropdown, Text, Flex, Input, TextArea, RadioGroup, FlexItem, Checkbox, Datepicker } from '@fluentui/react-northstar'
 import { FilesUploadIcon } from '@fluentui/react-icons-northstar'
 import * as microsoftTeams from "@microsoft/teams-js";
 
@@ -30,6 +30,18 @@ import FormatAlignRightIcon from '@material-ui/icons/FormatAlignRight';
 import { CSVReader } from 'react-papaparse';
 import Resizer from 'react-image-file-resizer';
 import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+
+//hours to be chosen when scheduling messages
+const hours = ["00", "01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11",
+    "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23",
+];
+
+//minutes to be chosen when scheduling messages
+const minutes = ["00", "05", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55",
+];
+
+//coeficient to round dates to the next 5 minutes
+const coeff = 1000 * 60 * 5;
 
 type dropdownItem = {
     key: string,
@@ -111,7 +123,12 @@ export interface IDraftMessage {
     uploadedListName: string,
     emailOption: boolean,
     exclusionList: string,
-    allUsers: boolean
+    allUsers: boolean,
+    isScheduled: boolean, // indicates if the message is scheduled
+    ScheduledDate: Date, // stores the scheduled date
+    isExpirySet: boolean, // indicates if the expiry date is set
+    expiryDate: Date, // stores the expiry date
+    isExpiredContentErased: boolean // indicates if the content is erased due to expiry date is in due course
 }
 
 export interface formState {
@@ -215,7 +232,19 @@ export interface formState {
     selectedFileName: string,
     exclusionList: string,
     resetCSVReader: boolean,
-    video: any
+    video: any,
+    selectedSchedule: boolean, //status of the scheduler checkbox
+    scheduledDate: string, //stores the scheduled date in string format
+    DMY: Date, //scheduled date in date format
+    DMYHour: string, //hour selected
+    DMYMins: string, //mins selected
+    futuredate: boolean, //if the date is in the future (valid schedule)
+    isExpirySet: boolean, //status of "the expiry date is set" checkbox
+    expiryDate: string, //stores the scheduled date in string format
+    expiryDMY: Date, //scheduled date in date format
+    expiryDMYHour: string, //hour selected
+    expiryDMYMins: string, //mins selected
+    expiryfuturedate: boolean //if the expiry date is in the future (valid schedule)
 }
 
 export interface INewMessageProps extends RouteComponentProps, WithTranslation {
@@ -430,7 +459,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 "$schema": "https://adaptivecards.io/schemas/adaptive-card.json",
                 "version": "1.2"
             }
-        ;
+            ;
+        var TempDate = this.getRoundedDate(5, this.getDateObject()); //get the current date
         //this.setDefaultCard(this.card);
         this.state = {
             video: null,
@@ -530,6 +560,18 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             selectedFile: "",
             selectedFileName: "",
             exclusionList: "",
+            selectedSchedule: false, //scheduler option is disabled by default
+            scheduledDate: TempDate.toUTCString(), //current date in UTC string format
+            DMY: TempDate, //current date in Date format
+            DMYHour: this.getDateHour(TempDate.toUTCString()), //initialize with the current hour (rounded up)
+            DMYMins: this.getDateMins(TempDate.toUTCString()), //initialize with the current minute (rounded up)
+            futuredate: false, //by default the date is not in the future
+            isExpirySet: false, //expiry option is disabled by default
+            expiryDate: TempDate.toUTCString(), //current date in UTC string format
+            expiryDMY: TempDate, //current date in Date format
+            expiryDMYHour: this.getDateHour(TempDate.toUTCString()), //initialize with the current hour (rounded up)
+            expiryDMYMins: this.getDateMins(TempDate.toUTCString()), //initialize with the current minute (rounded up)
+            expiryfuturedate: false, //by default the date is not in the future
             resetCSVReader: false
         }
         this.fileInput = React.createRef();
@@ -548,7 +590,9 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.getTeamList().then(() => {
             if ('id' in params) {
                 let id = params['id'];
+                console.log("id" + id + "params" + params);
                 this.getItem(id).then(() => {
+                    console.log("after getItem");
                     const selectedTeams = this.makeDropdownItemList(this.state.selectedTeams, this.state.teams);
                     const selectedRosters = this.makeDropdownItemList(this.state.selectedRosters, this.state.teams);
                     this.setState({
@@ -556,6 +600,16 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                         messageId: id,
                         selectedTeams: selectedTeams,
                         selectedRosters: selectedRosters,
+                        selectedSchedule: this.state.selectedSchedule,
+                        scheduledDate: this.state.scheduledDate,
+                        DMY: this.getDateObject(this.state.scheduledDate),
+                        DMYHour: this.getDateHour(this.state.scheduledDate),
+                        DMYMins: this.getDateMins(this.state.scheduledDate),
+                        isExpirySet: this.state.isExpirySet,
+                        expiryDate: this.state.expiryDate,
+                        expiryDMY: this.getDateObject(this.state.expiryDate),
+                        expiryDMYHour: this.getDateHour(this.state.expiryDate),
+                        expiryDMYMins: this.getDateMins(this.state.expiryDate),
                     })
                 });
                 this.getGroupData(id).then(() => {
@@ -572,6 +626,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                     let adaptiveCard = new AdaptiveCards.AdaptiveCard();
                     adaptiveCard.parse(this.state.card);
                     let renderedCard = adaptiveCard.render();
+                    console.log("this: " + this.state.card);
                     document.getElementsByClassName('adaptiveCardContainer')[0].appendChild(renderedCard);
                     if (this.state.btnLink) {
                         let link = this.state.btnLink;
@@ -1397,6 +1452,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     private getTeamList = async () => {
         try {
             const response = await getTeams();
+            console.log("teams: " + response);
             this.setState({
                 teams: response.data
             });
@@ -1406,44 +1462,60 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     }
 
     private onVideoUpload = (event: any) => {
-        //console.log(event.target);
         this.setState({
             video: event.target.files[0]
-        }, () => {
-
         });
     }
-
+    
     private uploadVideo = async() => {
         let storageAccountName = "45u3yv4vigkqc";
         let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2022-01-21T10:03:35Z&st=2022-01-19T02:03:35Z&spr=https&sig=h%2Frncoc%2F65mhdwxhwKUamZmJcAkV%2F18R%2F7cMSDm0o%2FU%3D";
+        //let storageAccountName = "qabra5qtfyb2w";
+        //let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-19T19:24:27Z&st=2022-01-19T11:24:27Z&spr=https&sig=NRfFQM%2F4wF9EKGpjWYCwwee%2FgUKhxnDq0qMHptaFtBU%3D";
+
+        var today = new Date();
+        const newVideo = new File(
+            [this.state.video],
+            `${today.getFullYear()}${today.getMonth()}${today.getDate()}${today.getHours()}${today.getMinutes()}${today.getSeconds()}-${this.state.video.name}`,
+            {type: this.state.video.type}
+        );
+    
+        this.setState({
+            video: newVideo
+        }, () => {
+            console.log(this.state.video)
+        });
+    
         const blobService = new BlobServiceClient(
             `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
         );
-
+    
         const containerClient = blobService.getContainerClient('files');
         await containerClient.createIfNotExists({
             access: 'container',
         });
-
+        
         const blobClient = containerClient.getBlockBlobClient(this.state.video.name);
-
-        // blobClient.catch((error) => {
-        //     return error;
-        // });
-
+    
         const options = { blobHTTPHeaders: { blobContentType: this.state.video.type }};
-
+    
         await blobClient.uploadBrowserData(this.state.video, options);
-
+    
         // let blobUrl = blobClient.Uri.AbsoluteUri;
         let blobUrl = blobClient.url;
+        //setVideoBtn(this.card, blobUrl);
+        //this.updateCard();
         console.log(blobUrl);
-        this.setState({
-            imageLink: blobUrl
-        }, () => {
-            this.onImageLinkChanged();
-        })
+        if (this.state.language === "Primary"){
+            this.setState({
+                videoLink: blobUrl
+            });
+        } else if (this.state.language === "Secondary"){
+            this.setState({
+                secVideoLink: blobUrl
+            });
+        }
+        
     }
 
     private printCon = (e: any) => {
@@ -1460,6 +1532,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     }
 
     private setGroupAccess = async () => {
+        console.log("group access");
         await verifyGroupAccess().then(() => {
             this.setState({
                 groupAccess: true
@@ -1492,7 +1565,9 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
     private getItem = async (id: number) => {
         try {
+            console.log("get item");
             const response = await getDraftNotification(id);
+            console.log("get item response: " + response)
             const draftMessageDetail = response.data;
             let selectedRadioButton = "teams";
             if (draftMessageDetail.rosters.length > 0) {
@@ -1522,7 +1597,11 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                 uploadedList: draftMessageDetail.uploadedList,
                 uploadedListName: draftMessageDetail.uploadedListName,
                 emailOption: draftMessageDetail.emailOption,
-                exclusionList: draftMessageDetail.exclusionList
+                exclusionList: draftMessageDetail.exclusionList,
+                selectedSchedule: draftMessageDetail.isScheduled,
+                scheduledDate: draftMessageDetail.scheduledDate,
+                isExpirySet: draftMessageDetail.isExpirySet,
+                expiryDate: draftMessageDetail.expiryDate,
             });
 
             setSenderTemplate(this.card, draftMessageDetail.senderTemplate);
@@ -1729,19 +1808,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                         <Flex className="scrollableContent">
                                             <Flex.Item size="size.half">
                                                 <Flex column className="formContentContainer">
-                                                    {/*<Dropdown*/}
-                                                    {/*    value={this.state.language}*/}
-                                                    {/*    items={language}*/}
-                                                    {/*    onChange={this.switchLanguage}*/}
-                                                    {/*    checkable*/}
-                                                    {/*/>*/}
-                                                    <Flex gap="gap.smaller" vAlign="end" className="inputField">
-                                                        <input onChange={this.onVideoUpload} type="file"/>
-                                                        <Button 
-                                                            onClick={this.uploadVideo} 
-                                                            content={this.localize("Upload")}
-                                                        />
-                                                    </Flex>
                                                     <Flex gap="gap.smaller" vAlign="end" className="inputField">
                                                         <Button
                                                             onClick={this.switchLanguage}
@@ -1948,6 +2014,118 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+                                                    {/*<FormControlLabel*/}
+                                                    {/*    control={*/}
+                                                    {/*        <Switch*/}
+                                                    {/*            color="primary"*/}
+                                                    {/*            checked={this.state.selectedSchedule}*/}
+                                                    {/*            onChange={this.onScheduleSelected}*/}
+                                                    {/*        />*/}
+                                                    {/*    }*/}
+                                                    {/*    label={this.localize("ScheduledSend")}*/}
+                                                    {/*/>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<FormControlLabel*/}
+                                                    {/*    control={*/}
+                                                    {/*        <Switch*/}
+                                                    {/*            color="primary"*/}
+                                                    {/*            checked={this.state.isExpirySet}*/}
+                                                    {/*            onChange={this.onIsExpirySetSelected}*/}
+                                                    {/*        />*/}
+                                                    {/*    }*/}
+                                                    {/*    label={this.localize("ExpirySend")}*/}
+                                                    {/*/>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -2187,6 +2365,104 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
+
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -2338,6 +2614,16 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         error={!(this.state.errorVideoUrlMessage === "")}
                                                         autoComplete="off"
                                                     />
+                                                    <Flex gap="gap.smaller" vAlign="center" className="inputField">
+                                                        <Input onChange={this.onVideoUpload} 
+                                                            type="file"
+                                                            accept="video/mp4"
+                                                        />
+                                                        <Button
+                                                            onClick={this.uploadVideo}
+                                                            content={this.localize("Upload")}
+                                                        />
+                                                    </Flex>
                                                     <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
                                                     <Input className="inputField"
                                                         fluid
@@ -2431,6 +2717,99 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -2580,6 +2959,16 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         error={!(this.state.errorVideoUrlMessage === "")}
                                                         autoComplete="off"
                                                     />
+                                                    <Flex gap="gap.smaller" vAlign="center" className="inputField">
+                                                        <Input onChange={this.onVideoUpload} 
+                                                            type="file"
+                                                            accept="video/mp4"
+                                                        />
+                                                        <Button
+                                                            onClick={this.uploadVideo}
+                                                            content={this.localize("Upload")}
+                                                        />
+                                                    </Flex>
                                                     <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
                                                     <Input className="inputField"
                                                         fluid
@@ -2673,6 +3062,100 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -2884,6 +3367,100 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -3093,6 +3670,99 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -3412,6 +4082,100 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -3722,6 +4486,100 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Text className={(this.state.errorLinkToSurveyUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorLinkToSurveyUrlMessage} />
+
+
+
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="ScheduleCheckBox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onScheduleSelected}*/}
+                                                    {/*        label={this.localize("ScheduledSend")}*/}
+                                                    {/*        checked={this.state.selectedSchedule}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.selectedSchedule}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.selectedSchedule}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.scheduledDate)}*/}
+                                                    {/*            onChange={this.handleMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+                                                    {/*<Flex hAlign="start">*/}
+                                                    {/*    <h3><Checkbox*/}
+                                                    {/*        className="IsExpirySetCheckbox"*/}
+                                                    {/*        labelPosition="start"*/}
+                                                    {/*        onClick={this.onIsExpirySetSelected}*/}
+                                                    {/*        label={this.localize("ExpirySend")}*/}
+                                                    {/*        checked={this.state.isExpirySet}*/}
+                                                    {/*        toggle*/}
+                                                    {/*    /></h3>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<Flex gap="gap.smaller" className="DateTimeSelector">*/}
+                                                    {/*    <Datepicker*/}
+                                                    {/*        disabled={!this.state.isExpirySet}*/}
+                                                    {/*        defaultSelectedDate={this.getDateObject(this.state.expiryDate)}*/}
+                                                    {/*        minDate={new Date()}*/}
+                                                    {/*        inputOnly*/}
+                                                    {/*        onDateChange={this.handleExpiryDateChange}*/}
+                                                    {/*    />*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="hour"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={hours}*/}
+                                                    {/*            defaultValue={this.getDateHour(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryHourChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*    <Flex.Item shrink={true} size="1%">*/}
+                                                    {/*        <Dropdown*/}
+                                                    {/*            placeholder="mins"*/}
+                                                    {/*            disabled={!this.state.isExpirySet}*/}
+                                                    {/*            fluid={true}*/}
+                                                    {/*            items={minutes}*/}
+                                                    {/*            defaultValue={this.getDateMins(this.state.expiryDate)}*/}
+                                                    {/*            onChange={this.handleExpiryMinsChange}*/}
+                                                    {/*        />*/}
+                                                    {/*    </Flex.Item>*/}
+                                                    {/*</Flex>*/}
+                                                    {/*<div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>*/}
+                                                    {/*    <div className="noteText">*/}
+                                                    {/*        <Text error content={this.localize('FutureDateError')} />*/}
+                                                    {/*    </div>*/}
+                                                    {/*</div>*/}
+
+
+
                                                 </Flex>
                                             </Flex.Item>
                                             <Flex.Item size="size.half">
@@ -3937,6 +4795,94 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                     label="Send email to members"
                                                 />
                                             {/*</div>*/}
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        color="primary"
+                                                        checked={this.state.selectedSchedule}
+                                                        onChange={this.onScheduleSelected}
+                                                    />
+                                                }
+                                                label={this.localize("ScheduledSend")}
+                                            />
+                                            <Flex gap="gap.smaller" className="DateTimeSelector">
+                                                <Datepicker
+                                                    disabled={!this.state.selectedSchedule}
+                                                    defaultSelectedDate={this.getDateObject(this.state.scheduledDate)}
+                                                    minDate={new Date()}
+                                                    inputOnly
+                                                    onDateChange={this.handleDateChange}
+                                                />
+                                                <Flex.Item shrink={true} size="1%">
+                                                    <Dropdown
+                                                        placeholder="hour"
+                                                        disabled={!this.state.selectedSchedule}
+                                                        fluid={true}
+                                                        items={hours}
+                                                        defaultValue={this.getDateHour(this.state.scheduledDate)}
+                                                        onChange={this.handleHourChange}
+                                                    />
+                                                </Flex.Item>
+                                                <Flex.Item shrink={true} size="1%">
+                                                    <Dropdown
+                                                        placeholder="mins"
+                                                        disabled={!this.state.selectedSchedule}
+                                                        fluid={true}
+                                                        items={minutes}
+                                                        defaultValue={this.getDateMins(this.state.scheduledDate)}
+                                                        onChange={this.handleMinsChange}
+                                                    />
+                                                </Flex.Item>
+                                            </Flex>
+                                            <div className={this.state.futuredate && this.state.selectedSchedule ? "ErrorMessage" : "hide"}>
+                                                <div className="noteText">
+                                                    <Text error content={this.localize('FutureDateError')} />
+                                                </div>
+                                            </div>
+                                            <FormControlLabel
+                                                control={
+                                                    <Switch
+                                                        color="primary"
+                                                        checked={this.state.isExpirySet}
+                                                        onChange={this.onIsExpirySetSelected}
+                                                    />
+                                                }
+                                                label={this.localize("ExpirySend")}
+                                            />
+                                            <Flex gap="gap.smaller" className="DateTimeSelector">
+                                                <Datepicker
+                                                    disabled={!this.state.isExpirySet}
+                                                    defaultSelectedDate={this.getDateObject(this.state.expiryDate)}
+                                                    minDate={new Date()}
+                                                    inputOnly
+                                                    onDateChange={this.handleExpiryDateChange}
+                                                />
+                                                <Flex.Item shrink={true} size="1%">
+                                                    <Dropdown
+                                                        placeholder="hour"
+                                                        disabled={!this.state.isExpirySet}
+                                                        fluid={true}
+                                                        items={hours}
+                                                        defaultValue={this.getDateHour(this.state.expiryDate)}
+                                                        onChange={this.handleExpiryHourChange}
+                                                    />
+                                                </Flex.Item>
+                                                <Flex.Item shrink={true} size="1%">
+                                                    <Dropdown
+                                                        placeholder="mins"
+                                                        disabled={!this.state.isExpirySet}
+                                                        fluid={true}
+                                                        items={minutes}
+                                                        defaultValue={this.getDateMins(this.state.expiryDate)}
+                                                        onChange={this.handleExpiryMinsChange}
+                                                    />
+                                                </Flex.Item>
+                                            </Flex>
+                                            <div className={this.state.expiryfuturedate && this.state.isExpirySet ? "ErrorMessage" : "hide"}>
+                                                <div className="noteText">
+                                                    <Text error content={this.localize('FutureDateError')} />
+                                                </div>
+                                            </div>
                                             
                                         </Flex>
                                         
@@ -4955,6 +5901,165 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         }
     }
 
+
+    //get the next rounded up (ceil) date in minutes
+    private getRoundedDate = (minutes: number, d = new Date()) => {
+
+        let ms = 1000 * 60 * minutes; // convert minutes to ms
+        let roundedDate = new Date(Math.ceil(d.getTime() / ms) * ms);
+
+        return roundedDate
+    }
+
+    //get date object based on the string parameter
+    private getDateObject = (datestring?: string) => {
+        if (!datestring) {
+            var TempDate = new Date(); //get current date
+            TempDate.setTime(TempDate.getTime() + 86400000);
+            return TempDate; //if date string is not provided, then return tomorrow rounded up next 5 minutes
+        }
+        return new Date(datestring); //if date string is provided, return current date object
+    }
+
+    //get the hour of the datestring
+    private getDateHour = (datestring: string) => {
+        if (!datestring) return "00";
+        var thour = new Date(datestring).getHours().toString();
+        return thour.padStart(2, "0");
+    }
+
+    //get the mins of the datestring
+    private getDateMins = (datestring: string) => {
+        if (!datestring) return "00";
+        var tmins = new Date(datestring).getMinutes().toString();
+        return tmins.padStart(2, "0");
+    }
+
+    //handles click on DatePicker to change the schedule date
+    private handleDateChange = (e: any, v: any) => {
+        var TempDate = v.value; //set the tempdate var with the value selected by the user
+        TempDate.setMinutes(parseInt(this.state.DMYMins)); //set the minutes selected on minutes drop down 
+        TempDate.setHours(parseInt(this.state.DMYHour)); //set the hour selected on hour drop down
+        //set the state variables
+        this.setState({
+            scheduledDate: TempDate.toUTCString(), //updates the state string representation
+            DMY: TempDate, //updates the date on the state
+        });
+    }
+
+    //handles selection on the hour combo
+    private handleHourChange = (e: any, v: any) => {
+        var TempDate = this.state.DMY; //get the tempdate from the state
+        TempDate.setHours(parseInt(v.value)); //set hour with the value select on the hour drop down
+        //set state variables
+        this.setState({
+            scheduledDate: TempDate.toUTCString(), //updates the string representation 
+            DMY: TempDate, //updates DMY
+            DMYHour: v.value, //set the new hour value on the state
+        });
+    }
+
+    //handles selection on the minutes combo
+    private handleMinsChange = (e: any, v: any) => {
+        var TempDate = this.state.DMY; //get the tempdate from the state
+        TempDate.setMinutes(parseInt(v.value)); //set minutes with the value select on the minutes drop down
+        //set state variables
+        this.setState({
+            scheduledDate: TempDate.toUTCString(), //updates the string representation 
+            DMY: TempDate, //updates DMY
+            DMYMins: v.value, //set the bew minutes on the state
+        });
+    }
+
+    //handler for the Schedule Send checkbox
+    private onScheduleSelected = () => {
+        var TempDate = this.getRoundedDate(5, this.getDateObject()); //get the next day date rounded to the nearest hour/minute
+        //set the state
+        this.setState({
+            selectedSchedule: !this.state.selectedSchedule,
+            scheduledDate: TempDate.toUTCString(),
+            DMY: TempDate
+        });
+    }
+
+    //handles click on DatePicker to change the expiry date
+    private handleExpiryDateChange = (e: any, v: any) => {
+        var TempDate = v.value; //set the tempdate var with the value selected by the user
+        TempDate.setMinutes(parseInt(this.state.expiryDMYMins)); //set the minutes selected on minutes drop down 
+        TempDate.setHours(parseInt(this.state.expiryDMYHour)); //set the hour selected on hour drop down
+        //set the state variables
+        this.setState({
+            expiryDate: TempDate.toUTCString(), //updates the state string representation
+            expiryDMY: TempDate, //updates the date on the state
+        });
+    }
+
+    //handles selection on the hour combo
+    private handleExpiryHourChange = (e: any, v: any) => {
+        var TempDate = this.state.expiryDMY; //get the tempdate from the state
+        TempDate.setHours(parseInt(v.value)); //set hour with the value select on the hour drop down
+        //set state variables
+        this.setState({
+            expiryDate: TempDate.toUTCString(), //updates the string representation 
+            expiryDMY: TempDate, //updates expiryDMY
+            expiryDMYHour: v.value, //set the new hour value on the state
+        });
+    }
+
+    //handles selection on the minutes combo
+    private handleExpiryMinsChange = (e: any, v: any) => {
+        var TempDate = this.state.expiryDMY; //get the tempdate from the state
+        TempDate.setMinutes(parseInt(v.value)); //set minutes with the value select on the minutes drop down
+        //set state variables
+        this.setState({
+            expiryDate: TempDate.toUTCString(), //updates the string representation 
+            expiryDMY: TempDate, //updates expiryDMY
+            expiryDMYMins: v.value, //set the bew minutes on the state
+        });
+    }
+
+    //handler for the Schedule Send checkbox
+    private onIsExpirySetSelected = () => {
+        var TempDate = this.getRoundedDate(5, this.getDateObject()); //get the next day date rounded to the nearest hour/minute
+        //set the state
+        this.setState({
+            isExpirySet: !this.state.isExpirySet,
+            expiryDate: TempDate.toUTCString(),
+            expiryDMY: TempDate
+        });
+    }
+
+
+
+    //called when the user clicks to schedule the message
+    private onSchedule = () => {
+        var Today = new Date(); //today date
+        var Scheduled = new Date(this.state.DMY); //scheduled date
+
+        var TempIsExpirySet = this.state.isExpirySet;
+        var TempExpiryDMY = new Date(this.state.expiryDMY); //scheduled date
+
+        //only allow the save when the scheduled date is 30 mins in the future, if that is the case calls the onSave function
+        if (Scheduled.getTime() > Today.getTime() + 1800000) {
+            if (TempIsExpirySet && TempExpiryDMY <= Scheduled) {
+                this.setState({
+                    expiryfuturedate: true
+                })
+            }
+            else {
+                this.onSave()
+            }
+        }
+        else {
+            //set the state to indicate future date error
+            //if futuredate is true, an error message is shown right below the date selector
+            this.setState({
+                futuredate: true
+            })
+        }
+    }
+
+
     private onSave = () => {
         const selectedTeams: string[] = [];
         const selctedRosters: string[] = [];
@@ -5029,6 +6134,11 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             teams: selectedTeams,
             rosters: selctedRosters,
             groups: selectedGroups,
+            isScheduled: this.state.selectedSchedule,
+            ScheduledDate: new Date(this.state.scheduledDate),
+            isExpirySet: this.state.isExpirySet,
+            expiryDate: new Date(this.state.expiryDate),
+            isExpiredContentErased: false,
             uploadedList: this.state.uploadedList,
             uploadedListName: this.state.uploadedListName,
             emailOption: this.state.emailOption,
@@ -5093,6 +6203,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             });
         } else if (this.state.page === "CardCreation") {
             this.setState({
+                video: null,
                 alignment: "left",
                 page: "TemplateSelection",
                 language: "Primary",

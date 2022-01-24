@@ -110,9 +110,6 @@ class Preference extends React.Component<MyProps, formState> {
                 tenantId: response.data[0].tenantId,
                 preference: response.data[0].preference,
                 userType: response.data[0].userType,
-                // id: response.data[0].id,
-                // aadId: response.data[0].aadId,
-                // preference: response.data[0].preference
             });
             //console.log("res: " + JSON.stringify(response));//.preference))response.data[0]
             console.log("res: " + JSON.stringify(response.data[0]));
@@ -168,7 +165,8 @@ class Preference extends React.Component<MyProps, formState> {
                         />
                     </Flex>
                     <Flex gap="gap.smaller" vAlign="end" hAlign="center">
-                        <PrimaryButton type="submit" value="Submit" text="Submit" onClick={this.onSave}/>
+                        {/*<PrimaryButton type="submit" value="Submit" text="Submit" onClick={this.onSave} />*/}
+                        <Button content="Submit" onClick={this.onSave}  primary />
                         {/*<Button onClick={test} content="Test"/>*/}
                     </Flex>
                     <Flex>

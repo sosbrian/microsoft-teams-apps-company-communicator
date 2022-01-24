@@ -95,6 +95,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                     repositoryOptions.StorageAccountConnectionString =
                         configuration.GetValue<string>("StorageAccountConnectionString");
 
+                    repositoryOptions.SasToken =
+                        configuration.GetValue<string>("SasToken");
+
                     // Setting this to true because the main application should ensure that all
                     // tables exist.
                     repositoryOptions.EnsureTableExists = true;

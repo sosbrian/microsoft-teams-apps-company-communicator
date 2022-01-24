@@ -5,6 +5,7 @@
 
 namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
@@ -67,6 +68,31 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Models
         /// Gets or sets a value indicating whether a notification should be sent to all the users.
         /// </summary>
         public bool AllUsers { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a notification is scheduled.
+        /// </summary>
+        public bool IsScheduled { get; set; }
+
+        /// <summary>
+        /// Gets or sets ScheduledDate value.
+        /// </summary>
+        public DateTime? ScheduledDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether a notification is set expiry date.
+        /// </summary>
+        public bool IsExpirySet { get; set; }
+
+        /// <summary>
+        /// Gets or sets ExpiryDate value.
+        /// </summary>
+        public DateTime? ExpiryDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the expired content is erased.
+        /// </summary>
+        public bool IsExpiredContentErased { get; set; }
 
         /// <summary>
         /// Validates a draft notification.

@@ -54,197 +54,198 @@ type dropdownItem = {
 }
 
 export interface IDraftMessage {
-    template?: string,
-    priLanguage: string,
-    secLanguage: string,
-    senderTemplate: string,
-    secSenderTemplate: string,
-    id?: string,
-    title: string,
-    imageLink?: string,
-    videoLink?: string,
     alignment?: string,
-    summary?: string,
-    boldSummary?: string,
-    fontSummary?: string,
-    fontSizeSummary?: string,
-    fontColorSummary?: string,
+    allUsers: boolean,
     author: string,
-    buttonTitle?: string,
+    boldSummary?: string,
+    buttonLink2?: string,
+    buttonLink3?: string,
+    buttonLink4?: string,
+    buttonLink5?: string,
     buttonLink?: string,
     buttonTitle2?: string,
-    buttonLink2?: string,
     buttonTitle3?: string,
-    buttonLink3?: string,
     buttonTitle4?: string,
-    buttonLink4?: string,
     buttonTitle5?: string,
-    buttonLink5?: string,
-    surReaction?: boolean,
-    reactionQuestion?: string,
-    surFreeText?: boolean,
-    freeTextQuestion?: string,
-    surYesNo?: boolean,
-    yesNoQuestion?: string,
-    surLinkToSurvey?: boolean,
-    linkToSurvey?: string,
-    secTitle: string,
-    secImageLink?: string,
-    secVideoLink?: string,
-    secAlignment?: string,
-    secSummary?: string,
-    secBoldSummary?: string,
-    secFontSummary?: string,
-    secFontSizeSummary?: string,
-    secFontColorSummary?: string,
-    secAuthor: string,
-    secButtonTitle?: string,
-    secButtonLink?: string,
-    secButtonTitle2?: string,
-    secButtonLink2?: string,
-    secButtonTitle3?: string,
-    secButtonLink3?: string,
-    secButtonTitle4?: string,
-    secButtonLink4?: string,
-    secButtonTitle5?: string,
-    secButtonLink5?: string,
-    secSurReaction?: boolean,
-    secReactionQuestion?: string,
-    secSurFreeText?: boolean,
-    secFreeTextQuestion?: string,
-    secSurYesNo?: boolean,
-    secYesNoQuestion?: string,
-    secSurLinkToSurvey?: boolean,
-    secLinkToSurvey?: string,
-    teams: any[],
-    rosters: any[],
-    groups: any[],
-    uploadedList: any[],
-    uploadedListName: string,
+    buttonTitle?: string,
     emailOption: boolean,
     exclusionList: string,
-    allUsers: boolean,
-    isScheduled: boolean, // indicates if the message is scheduled
-    ScheduledDate: Date, // stores the scheduled date
-    isExpirySet: boolean, // indicates if the expiry date is set
     expiryDate: Date, // stores the expiry date
+    fontColorSummary?: string,
+    fontSizeSummary?: string,
+    fontSummary?: string,
+    freeTextQuestion?: string,
+    groups: any[],
+    id?: string,
+    imageLink?: string,
     isExpiredContentErased: boolean // indicates if the content is erased due to expiry date is in due course
+    isExpirySet: boolean, // indicates if the expiry date is set
+    isScheduled: boolean, // indicates if the message is scheduled
+    linkToSurvey?: string,
+    priLanguage: string,
+    reactionQuestion?: string,
+    rosters: any[],
+    ScheduledDate: Date, // stores the scheduled date
+    secAlignment?: string,
+    secAuthor: string,
+    secBoldSummary?: string,
+    secButtonLink2?: string,
+    secButtonLink3?: string,
+    secButtonLink4?: string,
+    secButtonLink5?: string,
+    secButtonLink?: string,
+    secButtonTitle2?: string,
+    secButtonTitle3?: string,
+    secButtonTitle4?: string,
+    secButtonTitle5?: string,
+    secButtonTitle?: string,
+    secFontColorSummary?: string,
+    secFontSizeSummary?: string,
+    secFontSummary?: string,
+    secFreeTextQuestion?: string,
+    secImageLink?: string,
+    secLanguage: string,
+    secLinkToSurvey?: string,
+    secReactionQuestion?: string,
+    secSenderTemplate: string,
+    secSummary?: string,
+    secSurFreeText?: boolean,
+    secSurLinkToSurvey?: boolean,
+    secSurReaction?: boolean,
+    secSurYesNo?: boolean,
+    secTitle: string,
+    secVideoLink?: string,
+    secYesNoQuestion?: string,
+    senderTemplate: string,
+    summary?: string,
+    surFreeText?: boolean,
+    surLinkToSurvey?: boolean,
+    surReaction?: boolean,
+    surYesNo?: boolean,
+    teams: any[],
+    template?: string,
+    title: string,
+    uploadedList: any[],
+    uploadedListName: string,
+    videoLink?: string,
+    yesNoQuestion?: string,
 }
 
 export interface formState {
-    template: string,
-    senderTemplate: string,
-    secSenderTemplate: string,
-    title: string,
-    summary?: string,
-    boldSummary?: string,
-    fontSummary?: string,
-    fontSizeSummary?: string,
-    fontColorSummary?: string,
     alignment?: string,
-    btnLink?: string,
+    allUsersOptionSelected: boolean,
+    author: string,
+    boldSummary?: string,
     btnLink2?: string,
     btnLink3?: string,
     btnLink4?: string,
     btnLink5?: string,
-    imageLink?: string,
-    videoLink?: string,
-    btnTitle?: string,
+    btnLink?: string,
     btnTitle2?: string,
     btnTitle3?: string,
     btnTitle4?: string,
     btnTitle5?: string,
-    surReaction?: boolean,
-    reactionQuestion?: string,
-    surFreeText?: boolean,
-    freeTextQuestion?: string,
-    surYesNo?: boolean,
-    yesNoQuestion?: string,
-    surLinkToSurvey?: boolean,
-    linkToSurvey?: string,
-    author: string,
-    secTitle: string,
-    secImageLink?: string,
-    secVideoLink?: string,
-    secAlignment?: string,
-    secSummary?: string,
-    secBoldSummary?: string,
-    secFontSummary?: string,
-    secFontSizeSummary?: string,
-    secFontColorSummary?: string,
-    secAuthor: string,
-    secbtnTitle?: string,
-    secbtnLink?: string,
-    secbtnTitle2?: string,
-    secbtnLink2?: string,
-    secbtnTitle3?: string,
-    secbtnLink3?: string,
-    secbtnTitle4?: string,
-    secbtnLink4?: string,
-    secbtnTitle5?: string,
-    secbtnLink5?: string,
-    secSurReaction?: boolean,
-    secReactionQuestion?: string,
-    secSurFreeText?: boolean,
-    secFreeTextQuestion?: string,
-    secSurYesNo?: boolean,
-    secYesNoQuestion?: string,
-    secSurLinkToSurvey?: boolean,
-    secLinkToSurvey?: string,
+    btnTitle?: string,
     card?: any,
-    page: string,
-    language: string,
-    priLanguage: string,
-    secLanguage: string,
-    teamsOptionSelected: boolean,
-    rostersOptionSelected: boolean,
-    allUsersOptionSelected: boolean,
-    groupsOptionSelected: boolean,
-    uploadOptionSelected: boolean,
-    teams?: any[],
-    groups?: any[],
-    exists?: boolean,
-    messageId: string,
-    loader: boolean,
-    groupAccess: boolean,
-    loading: boolean,
-    noResultMessage: string,
-    unstablePinned?: boolean,
-    selectedTeamsNum: number,
-    selectedRostersNum: number,
-    selectedGroupsNum: number,
-    selectedRadioBtn: string,
-    selectedTeams: dropdownItem[],
-    selectedRosters: dropdownItem[],
-    selectedGroups: dropdownItem[],
-    uploadedList: any[],
-    uploadedListName: string,
+    DMY: Date, //scheduled date in date format
+    DMYHour: string, //hour selected
+    DMYMins: string, //mins selected
     emailOption: boolean,
-    errorImageUrlMessage: string,
-    errorVideoUrlMessage: string,
-    errorButtonUrlMessage: string,
     errorButtonUrlMessage2: string,
     errorButtonUrlMessage3: string,
     errorButtonUrlMessage4: string,
     errorButtonUrlMessage5: string,
+    errorButtonUrlMessage: string,
+    errorImageUrlMessage: string,
     errorLinkToSurveyUrlMessage: string,
-    selectedFile: string,
-    selectedFileName: string,
+    errorVideoUrlMessage: string,
     exclusionList: string,
-    resetCSVReader: boolean,
-    video: any,
-    selectedSchedule: boolean, //status of the scheduler checkbox
-    scheduledDate: string, //stores the scheduled date in string format
-    DMY: Date, //scheduled date in date format
-    DMYHour: string, //hour selected
-    DMYMins: string, //mins selected
-    futuredate: boolean, //if the date is in the future (valid schedule)
-    isExpirySet: boolean, //status of "the expiry date is set" checkbox
+    exists?: boolean,
     expiryDate: string, //stores the scheduled date in string format
     expiryDMY: Date, //scheduled date in date format
     expiryDMYHour: string, //hour selected
     expiryDMYMins: string, //mins selected
     expiryfuturedate: boolean //if the expiry date is in the future (valid schedule)
+    fontColorSummary?: string,
+    fontSizeSummary?: string,
+    fontSummary?: string,
+    freeTextQuestion?: string,
+    futuredate: boolean, //if the date is in the future (valid schedule)
+    groupAccess: boolean,
+    groupsOptionSelected: boolean,
+    groups?: any[],
+    imageLink?: string,
+    isExpirySet: boolean, //status of "the expiry date is set" checkbox
+    language: string,
+    linkToSurvey?: string,
+    loader: boolean,
+    loading: boolean,
+    messageId: string,
+    noResultMessage: string,
+    page: string,
+    priLanguage: string,
+    reactionQuestion?: string,
+    resetCSVReader: boolean,
+    rostersOptionSelected: boolean,
+    scheduledDate: string, //stores the scheduled date in string format
+    secAlignment?: string,
+    secAuthor: string,
+    secBoldSummary?: string,
+    secbtnLink2?: string,
+    secbtnLink3?: string,
+    secbtnLink4?: string,
+    secbtnLink5?: string,
+    secbtnLink?: string,
+    secbtnTitle2?: string,
+    secbtnTitle3?: string,
+    secbtnTitle4?: string,
+    secbtnTitle5?: string,
+    secbtnTitle?: string,
+    secFontColorSummary?: string,
+    secFontSizeSummary?: string,
+    secFontSummary?: string,
+    secFreeTextQuestion?: string,
+    secImageLink?: string,
+    secLanguage: string,
+    secLinkToSurvey?: string,
+    secReactionQuestion?: string,
+    secSenderTemplate: string,
+    secSummary?: string,
+    secSurFreeText?: boolean,
+    secSurLinkToSurvey?: boolean,
+    secSurReaction?: boolean,
+    secSurYesNo?: boolean,
+    secTitle: string,
+    secVideoLink?: string,
+    secYesNoQuestion?: string,
+    selectedFile: string,
+    selectedFileName: string,
+    selectedGroups: dropdownItem[],
+    selectedGroupsNum: number,
+    selectedRadioBtn: string,
+    selectedRosters: dropdownItem[],
+    selectedRostersNum: number,
+    selectedSchedule: boolean, //status of the scheduler checkbox
+    selectedTeams: dropdownItem[],
+    selectedTeamsNum: number,
+    senderTemplate: string,
+    summary?: string,
+    surFreeText?: boolean,
+    surLinkToSurvey?: boolean,
+    surReaction?: boolean,
+    surYesNo?: boolean,
+    teamsOptionSelected: boolean,
+    teams?: any[],
+    template: string,
+    title: string,
+    unstablePinned?: boolean,
+    uploadedList: any[],
+    uploadedListName: string,
+    uploadOptionSelected: boolean,
+    uploadStatus: string,
+    video: any,
+    videoLink?: string,
+    yesNoQuestion?: string,
 }
 
 export interface INewMessageProps extends RouteComponentProps, WithTranslation {
@@ -463,116 +464,117 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         var TempDate = this.getRoundedDate(5, this.getDateObject()); //get the current date
         //this.setDefaultCard(this.card);
         this.state = {
-            video: null,
-            template: "",
-            senderTemplate: "",
-            secSenderTemplate: "",
-            title: "",
-            summary: "",
             alignment: "left",
-            fontSummary: "",
-            fontSizeSummary: "",
-            fontColorSummary: "",
-            boldSummary: "",
+            allUsersOptionSelected: false,
             author: "",
-            btnLink: "",
+            boldSummary: "",
             btnLink2: "",
             btnLink3: "",
             btnLink4: "",
             btnLink5: "",
-            imageLink: "",
-            videoLink: "",
-            btnTitle: "",
+            btnLink: "",
             btnTitle2: "",
             btnTitle3: "",
             btnTitle4: "",
             btnTitle5: "",
-            surReaction: false,
-            reactionQuestion: "",
-            surFreeText: false,
-            freeTextQuestion: "",
-            surYesNo: false,
-            yesNoQuestion: "",
-            surLinkToSurvey: false,
-            linkToSurvey: "",
-            secTitle: "",
-            secImageLink: "",
-            secVideoLink: "",
-            secAlignment: "left",
-            secSummary: "",
-            secBoldSummary: "",
-            secFontSummary: "",
-            secFontSizeSummary: "",
-            secFontColorSummary: "",
-            secAuthor: "",
-            secbtnTitle: "",
-            secbtnLink: "",
-            secbtnTitle2: "",
-            secbtnLink2: "",
-            secbtnTitle3: "",
-            secbtnLink3: "",
-            secbtnTitle4: "",
-            secbtnLink4: "",
-            secbtnTitle5: "",
-            secbtnLink5: "",
-            secSurReaction: false,
-            secReactionQuestion: "",
-            secSurFreeText: false,
-            secFreeTextQuestion: "",
-            secSurYesNo: false,
-            secYesNoQuestion: "",
-            secSurLinkToSurvey: false,
-            secLinkToSurvey: "",
+            btnTitle: "",
             card: this.card,
-            page: "TemplateSelection",
-            language: "Primary",
-            priLanguage: "English",
-            secLanguage: "",
-            teamsOptionSelected: true,
-            rostersOptionSelected: false,
-            allUsersOptionSelected: false,
-            groupsOptionSelected: false,
-            uploadOptionSelected: false,
-            messageId: "",
-            loader: true,
-            groupAccess: false,
-            loading: false,
-            noResultMessage: "",
-            unstablePinned: true,
-            selectedTeamsNum: 0,
-            selectedRostersNum: 0,
-            selectedGroupsNum: 0,
-            selectedRadioBtn: "teams",
-            selectedTeams: [],
-            selectedRosters: [],
-            selectedGroups: [],
-            uploadedList: [],
-            uploadedListName: "",
+            DMY: TempDate, //current date in Date format
+            DMYHour: this.getDateHour(TempDate.toUTCString()), //initialize with the current hour (rounded up)
+            DMYMins: this.getDateMins(TempDate.toUTCString()), //initialize with the current minute (rounded up)
             emailOption: false,
-            errorImageUrlMessage: "",
-            errorVideoUrlMessage: "",
-            errorButtonUrlMessage: "",
             errorButtonUrlMessage2: "",
             errorButtonUrlMessage3: "",
             errorButtonUrlMessage4: "",
             errorButtonUrlMessage5: "",
+            errorButtonUrlMessage: "",
+            errorImageUrlMessage: "",
             errorLinkToSurveyUrlMessage: "",
-            selectedFile: "",
-            selectedFileName: "",
+            errorVideoUrlMessage: "",
             exclusionList: "",
-            selectedSchedule: false, //scheduler option is disabled by default
-            scheduledDate: TempDate.toUTCString(), //current date in UTC string format
-            DMY: TempDate, //current date in Date format
-            DMYHour: this.getDateHour(TempDate.toUTCString()), //initialize with the current hour (rounded up)
-            DMYMins: this.getDateMins(TempDate.toUTCString()), //initialize with the current minute (rounded up)
-            futuredate: false, //by default the date is not in the future
-            isExpirySet: false, //expiry option is disabled by default
             expiryDate: TempDate.toUTCString(), //current date in UTC string format
             expiryDMY: TempDate, //current date in Date format
             expiryDMYHour: this.getDateHour(TempDate.toUTCString()), //initialize with the current hour (rounded up)
             expiryDMYMins: this.getDateMins(TempDate.toUTCString()), //initialize with the current minute (rounded up)
             expiryfuturedate: false, //by default the date is not in the future
-            resetCSVReader: false
+            fontColorSummary: "",
+            fontSizeSummary: "",
+            fontSummary: "",
+            freeTextQuestion: "",
+            futuredate: false, //by default the date is not in the future
+            groupAccess: false,
+            groupsOptionSelected: false,
+            imageLink: "",
+            isExpirySet: false, //expiry option is disabled by default
+            language: "Primary",
+            linkToSurvey: "",
+            loader: true,
+            loading: false,
+            messageId: "",
+            noResultMessage: "",
+            page: "TemplateSelection",
+            priLanguage: "English",
+            reactionQuestion: "",
+            resetCSVReader: false,
+            rostersOptionSelected: false,
+            scheduledDate: TempDate.toUTCString(), //current date in UTC string format
+            secAlignment: "left",
+            secAuthor: "",
+            secBoldSummary: "",
+            secbtnLink2: "",
+            secbtnLink3: "",
+            secbtnLink4: "",
+            secbtnLink5: "",
+            secbtnLink: "",
+            secbtnTitle2: "",
+            secbtnTitle3: "",
+            secbtnTitle4: "",
+            secbtnTitle5: "",
+            secbtnTitle: "",
+            secFontColorSummary: "",
+            secFontSizeSummary: "",
+            secFontSummary: "",
+            secFreeTextQuestion: "",
+            secImageLink: "",
+            secLanguage: "",
+            secLinkToSurvey: "",
+            secReactionQuestion: "",
+            secSenderTemplate: "",
+            secSummary: "",
+            secSurFreeText: false,
+            secSurLinkToSurvey: false,
+            secSurReaction: false,
+            secSurYesNo: false,
+            secTitle: "",
+            secVideoLink: "",
+            secYesNoQuestion: "",
+            selectedFile: "",
+            selectedFileName: "",
+            selectedGroups: [],
+            selectedGroupsNum: 0,
+            selectedRadioBtn: "teams",
+            selectedRosters: [],
+            selectedRostersNum: 0,
+            selectedSchedule: false, //scheduler option is disabled by default
+            selectedTeams: [],
+            selectedTeamsNum: 0,
+            senderTemplate: "",
+            summary: "",
+            surFreeText: false,
+            surLinkToSurvey: false,
+            surReaction: false,
+            surYesNo: false,
+            teamsOptionSelected: true,
+            template: "",
+            title: "",
+            unstablePinned: true,
+            uploadedList: [],
+            uploadedListName: "",
+            uploadOptionSelected: false,
+            uploadStatus: "",
+            video: null,
+            videoLink: "",
+            yesNoQuestion: "",
         }
         this.fileInput = React.createRef();
         this.handleImageSelection = this.handleImageSelection.bind(this);
@@ -590,9 +592,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.getTeamList().then(() => {
             if ('id' in params) {
                 let id = params['id'];
-                console.log("id" + id + "params" + params);
                 this.getItem(id).then(() => {
-                    console.log("after getItem");
                     const selectedTeams = this.makeDropdownItemList(this.state.selectedTeams, this.state.teams);
                     const selectedRosters = this.makeDropdownItemList(this.state.selectedRosters, this.state.teams);
                     this.setState({
@@ -626,7 +626,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                     let adaptiveCard = new AdaptiveCards.AdaptiveCard();
                     adaptiveCard.parse(this.state.card);
                     let renderedCard = adaptiveCard.render();
-                    console.log("this: " + this.state.card);
                     document.getElementsByClassName('adaptiveCardContainer')[0].appendChild(renderedCard);
                     if (this.state.btnLink) {
                         let link = this.state.btnLink;
@@ -639,18 +638,13 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
     //function to handle the secondary language layout
     private switchLanguage = (event: any, itemsData: any) => {
-        //console.log(event)
         if (itemsData.value === "Primary") {
             this.setState({
                 language: "Primary"
-            }, () => {
-                console.log("Language: " + this.state.language);
             });
         } else if (itemsData.value === "Secondary") {
             this.setState({
                 language: "Secondary"
-            }, () => {
-                console.log("Language: " + this.state.language);
             });
         }
     }
@@ -686,14 +680,12 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                             imageLink: uri.toString()
                         }
                         );
-                        console.log(this.state.imageLink)
                     } else {
                         var errormsg = this.localize("ErrorImageTooBig") + " " + this.localize("ErrorImageTooBigSize") + " " + (30720 - cardsize) + " bytes.";
                         //images bigger than 32K cannot be saved, set the error message to be presented
                         this.setState({
                             errorImageUrlMessage: errormsg
                         });
-                        console.log(this.state.imageLink)
                     }
 
                 },
@@ -727,14 +719,12 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                             secImageLink: uri.toString()
                         }
                         );
-                        console.log(this.state.secImageLink)
                     } else {
                         var errormsg = this.localize("ErrorImageTooBig") + " " + this.localize("ErrorImageTooBigSize") + " " + (30720 - cardsize) + " bytes.";
                         //images bigger than 32K cannot be saved, set the error message to be presented
                         this.setState({
                             errorImageUrlMessage: errormsg
                         });
-                        console.log(this.state.secImageLink)
                     }
 
                 },
@@ -1452,7 +1442,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     private getTeamList = async () => {
         try {
             const response = await getTeams();
-            console.log("teams: " + response);
             this.setState({
                 teams: response.data
             });
@@ -1463,13 +1452,17 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
 
     private onVideoUpload = (event: any) => {
         this.setState({
-            video: event.target.files[0]
+            video: event.target.files[0],
+            uploadStatus: ""
         });
     }
     
-    private uploadVideo = async() => {
+    private uploadVideo = async () => {
+        this.setState({
+            uploadStatus: "Upload..."
+        });
         let storageAccountName = "45u3yv4vigkqc";
-        let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2022-01-21T10:03:35Z&st=2022-01-19T02:03:35Z&spr=https&sig=h%2Frncoc%2F65mhdwxhwKUamZmJcAkV%2F18R%2F7cMSDm0o%2FU%3D";
+        let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-24T15:09:09Z&st=2022-01-24T07:09:09Z&spr=https&sig=j2simiX4QfXRhRFC867wxgkiMhcCOcEfKM4j4XjzoY8%3D";
         //let storageAccountName = "qabra5qtfyb2w";
         //let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-19T19:24:27Z&st=2022-01-19T11:24:27Z&spr=https&sig=NRfFQM%2F4wF9EKGpjWYCwwee%2FgUKhxnDq0qMHptaFtBU%3D";
 
@@ -1500,7 +1493,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         const options = { blobHTTPHeaders: { blobContentType: this.state.video.type }};
     
         await blobClient.uploadBrowserData(this.state.video, options);
-    
         // let blobUrl = blobClient.Uri.AbsoluteUri;
         let blobUrl = blobClient.url;
         //setVideoBtn(this.card, blobUrl);
@@ -1508,11 +1500,13 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         console.log(blobUrl);
         if (this.state.language === "Primary"){
             this.setState({
-                videoLink: blobUrl
+                videoLink: blobUrl,
+                uploadStatus: "Upload Success."
             });
         } else if (this.state.language === "Secondary"){
             this.setState({
-                secVideoLink: blobUrl
+                secVideoLink: blobUrl,
+                uploadStatus: "Upload Success."
             });
         }
         
@@ -2606,6 +2600,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                         fluid
                                                     />
+                                                    {/*<Flex gap="gap.smaller" vAlign="end" className="inputField">*/}
                                                     <Input fluid className="inputField"
                                                         value={this.state.videoLink}
                                                         label={this.localize("Video URL")}
@@ -2614,8 +2609,14 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         error={!(this.state.errorVideoUrlMessage === "")}
                                                         autoComplete="off"
                                                     />
+                                                        {/*<Input onChange={this.onVideoUpload}*/}
+                                                        {/*    type="file"*/}
+                                                        {/*    accept="video/mp4"*/}
+                                                        {/*/>*/}
+                                                    {/*</Flex>*/}
                                                     <Flex gap="gap.smaller" vAlign="center" className="inputField">
-                                                        <Input onChange={this.onVideoUpload} 
+                                                        <input onChange={this.onVideoUpload}
+                                                            style={{ background: 'none', width: '100%' }}
                                                             type="file"
                                                             accept="video/mp4"
                                                         />
@@ -2624,6 +2625,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                             content={this.localize("Upload")}
                                                         />
                                                     </Flex>
+                                                    <Text className={(this.state.uploadStatus === "") ? "hide" : "show"} size="small" content={this.state.uploadStatus} />
                                                     <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
                                                     <Input className="inputField"
                                                         fluid
@@ -2960,7 +2962,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         autoComplete="off"
                                                     />
                                                     <Flex gap="gap.smaller" vAlign="center" className="inputField">
-                                                        <Input onChange={this.onVideoUpload} 
+                                                        <input onChange={this.onVideoUpload}
+                                                            style={{ background: 'none', width: '100%' }}
                                                             type="file"
                                                             accept="video/mp4"
                                                         />
@@ -2969,6 +2972,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                             content={this.localize("Upload")}
                                                         />
                                                     </Flex>
+                                                    <Text className={(this.state.uploadStatus === "") ? "hide" : "show"} size="small" content={this.state.uploadStatus} />
                                                     <Text className={(this.state.errorVideoUrlMessage === "") ? "hide" : "show"} error size="small" content={this.state.errorVideoUrlMessage} />
                                                     <Input className="inputField"
                                                         fluid
@@ -6203,70 +6207,71 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             });
         } else if (this.state.page === "CardCreation") {
             this.setState({
-                video: null,
                 alignment: "left",
-                page: "TemplateSelection",
-                language: "Primary",
-                priLanguage: "English",
-                secLanguage: "",
-                title: "",
-                summary: "",
-                fontSummary: "",
-                fontSizeSummary: "",
-                fontColorSummary: "",
-                boldSummary: "",
                 author: "",
-                btnLink: "",
+                boldSummary: "",
                 btnLink2: "",
                 btnLink3: "",
                 btnLink4: "",
                 btnLink5: "",
-                imageLink: "",
-                videoLink: "",
-                btnTitle: "",
+                btnLink: "",
                 btnTitle2: "",
                 btnTitle3: "",
                 btnTitle4: "",
                 btnTitle5: "",
-                template: "",
-                senderTemplate: "",
-                surReaction: false,
-                reactionQuestion: "",
-                surFreeText: false,
+                btnTitle: "",
+                fontColorSummary: "",
+                fontSizeSummary: "",
+                fontSummary: "",
                 freeTextQuestion: "",
-                surYesNo: false,
-                yesNoQuestion: "",
-                surLinkToSurvey: false,
+                imageLink: "",
+                language: "Primary",
                 linkToSurvey: "",
-                secTitle: "",
-                secImageLink: "",
-                secVideoLink: "",
+                page: "TemplateSelection",
+                priLanguage: "English",
+                reactionQuestion: "",
                 secAlignment: "left",
-                secSummary: "",
-                secBoldSummary: "",
-                secFontSummary: "",
-                secFontSizeSummary: "",
-                secFontColorSummary: "",
                 secAuthor: "",
-                secbtnTitle: "",
+                secBoldSummary: "",
+                secbtnLink2: "",
+                secbtnLink3: "",
+                secbtnLink4: "",
+                secbtnLink5: "",
                 secbtnLink: "",
                 secbtnTitle2: "",
-                secbtnLink2: "",
                 secbtnTitle3: "",
-                secbtnLink3: "",
                 secbtnTitle4: "",
-                secbtnLink4: "",
                 secbtnTitle5: "",
-                secbtnLink5: "",
-                secSurReaction: false,
-                secReactionQuestion: "",
-                secSurFreeText: false,
+                secbtnTitle: "",
+                secFontColorSummary: "",
+                secFontSizeSummary: "",
+                secFontSummary: "",
                 secFreeTextQuestion: "",
-                secSurYesNo: false,
-                secYesNoQuestion: "",
-                secSurLinkToSurvey: false,
+                secImageLink: "",
+                secLanguage: "",
                 secLinkToSurvey: "",
+                secReactionQuestion: "",
                 secSenderTemplate: "",
+                secSummary: "",
+                secSurFreeText: false,
+                secSurLinkToSurvey: false,
+                secSurReaction: false,
+                secSurYesNo: false,
+                secTitle: "",
+                secVideoLink: "",
+                secYesNoQuestion: "",
+                senderTemplate: "",
+                summary: "",
+                surFreeText: false,
+                surLinkToSurvey: false,
+                surReaction: false,
+                surYesNo: false,
+                template: "",
+                title: "",
+                uploadStatus: "",
+                video: null,
+                videoLink: "",
+                yesNoQuestion: "",
                 card:
                 {
                     "type": "AdaptiveCard",

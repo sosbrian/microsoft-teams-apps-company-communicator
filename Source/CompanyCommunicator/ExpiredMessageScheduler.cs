@@ -11,6 +11,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
     using Microsoft.Extensions.Logging;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.MessageQueues.DataQueue;
@@ -28,13 +29,14 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
         private readonly IDataQueue dataQueue;
         private readonly double forceCompleteMessageDelayInSeconds;
         private Timer smstimer;
+        private readonly IAppSettingsService appSettingsService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpiredMessageScheduler"/> class.
         /// </summary>
         /// <param name="logger">system logger.</param>
         /// <param name="factory">factory.</param>
-        public ExpiredMessageScheduler(ILogger<SendMessageScheduler> logger, IServiceScopeFactory factory)
+        public ExpiredMessageScheduler(ILogger<SendMessageScheduler> logger, IServiceScopeFactory factory, IAppSettingsService appSettingsService)
         {
             this.smslogger = logger;
             this.notificationDataRepository = factory.CreateScope().ServiceProvider.GetRequiredService<INotificationDataRepository>();
@@ -42,6 +44,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             this.prepareToSendQueue = factory.CreateScope().ServiceProvider.GetRequiredService<IPrepareToSendQueue>();
             this.dataQueue = factory.CreateScope().ServiceProvider.GetRequiredService<IDataQueue>();
             this.forceCompleteMessageDelayInSeconds = 86400;
+            this.appSettingsService = appSettingsService ?? throw new ArgumentNullException(nameof(appSettingsService));
         }
 
         /// <summary>
@@ -87,6 +90,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
             this.smslogger.LogInformation(
                 "[CC Expiry Scheduler] is processing expired messages before {Now}.", now);
 
+            var serviceUrl = await this.appSettingsService.GetServiceUrlAsync();
+
             try
             {
                 var notificationEntities = await this.notificationDataRepository.GetNonErasedExpiredNotificationsAsync();
@@ -94,7 +99,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                 {
                     this.smslogger.LogInformation("[CC Expiry Scheduler] sending notification: {0}", notificationEntity.Title);
                     await this.notificationDataRepository.UpdateExpiredNotificationAsync(notificationEntity.Id);
-                    await this.sentNotificationDataRepository.UpdateSentNotificationCardAsync(notificationEntity.Id);
+                    await this.sentNotificationDataRepository.UpdateSentNotificationCardAsync(notificationEntity.Id, serviceUrl);
                 }
             }
             catch (Exception ex)

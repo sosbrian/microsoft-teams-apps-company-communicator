@@ -27,7 +27,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         private readonly AdaptiveCardCreator adaptiveCardCreator;
         private readonly string userAppId;
         private readonly BotFrameworkHttpAdapter botAdapter;
-        private readonly IAppSettingsService appSettingsService;
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SentNotificationDataRepository"/> class.
@@ -36,7 +36,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         /// <param name="repositoryOptions">Options used to create the repository.</param>
         public SentNotificationDataRepository(
             ILogger<SentNotificationDataRepository> logger,
-            //IAppSettingsService appSettingsService,
             BotFrameworkHttpAdapter botAdapter,
             IOptions<BotOptions> botOptions,
             IOptions<RepositoryOptions> repositoryOptions)
@@ -49,7 +48,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         {
             this.botAdapter = botAdapter ?? throw new ArgumentNullException(nameof(botAdapter));
             this.userAppId = botOptions?.Value?.UserAppId ?? throw new ArgumentNullException(nameof(botOptions));
-            //this.appSettingsService = appSettingsService ?? throw new ArgumentNullException(nameof(appSettingsService));
         }
 
         /// <inheritdoc/>
@@ -63,7 +61,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
         }
 
         /// <inheritdoc/>
-        public async Task UpdateSentNotificationCardAsync(string notificationId)
+        public async Task UpdateSentNotificationCardAsync(string notificationId, string url)
         {
             AdaptiveCard card = new AdaptiveCard(new AdaptiveSchemaVersion(1, 0));
 
@@ -72,9 +70,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
                 Text = "No longer available.",
                 Size = AdaptiveTextSize.Small,
             });
-
-            //var serviceUrl = await this.appSettingsService.GetServiceUrlAsync();
-            var serviceUrl = "https://smba.trafficmanager.net/apac/";
 
             var sentNotification = await this.GetAllAsync(
                 partition: notificationId);
@@ -101,7 +96,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotif
 
                     var conversationReference = new ConversationReference
                     {
-                        ServiceUrl = serviceUrl,
+                        ServiceUrl = url,
                         Conversation = new ConversationAccount
                         {
                             Id = y.ConversationId,

@@ -80,6 +80,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator
                     botOptions.UserAppPassword = configuration.GetValue<string>("UserAppPassword");
                     botOptions.AuthorAppId = configuration.GetValue<string>("AuthorAppId");
                     botOptions.AuthorAppPassword = configuration.GetValue<string>("AuthorAppPassword");
+                    botOptions.StorageAccountName = configuration.GetValue<string>("StorageAccountName");
+                    botOptions.SasToken = configuration.GetValue<string>("SasToken");
                 });
             services.AddOptions<BotFilterMiddlewareOptions>()
                 .Configure<IConfiguration>((botFilterMiddlewareOptions, configuration) =>

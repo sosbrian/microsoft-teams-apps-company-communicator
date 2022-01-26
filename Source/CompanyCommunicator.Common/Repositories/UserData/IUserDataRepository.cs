@@ -28,6 +28,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
 
         public Task<IEnumerable<UserDataEntity>> GetSortedUserAsync();
 
-        public Task<IEnumerable<UserDataEntity>> GetUserDataEntitiesByIdsAsync(IEnumerable<string> userIds);
+        public Task<UserDataEntity> GetUserDataEntitiesByIdsAsync(string userId);
     }
 }

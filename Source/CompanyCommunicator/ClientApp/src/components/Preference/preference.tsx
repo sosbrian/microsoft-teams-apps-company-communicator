@@ -102,17 +102,15 @@ class Preference extends React.Component<MyProps, formState> {
         try {
             const response = await getUsers(id);
             this.setState({
-                partitionKey: response.data[0].partitionKey,
-                rowKey: response.data[0].rowKey,
-                aadId: response.data[0].aadId,
-                userId: response.data[0].userId,
-                conversationId: response.data[0].conversationId,
-                tenantId: response.data[0].tenantId,
-                preference: response.data[0].preference,
-                userType: response.data[0].userType,
+                partitionKey: response.data.partitionKey,
+                rowKey: response.data.rowKey,
+                aadId: response.data.aadId,
+                userId: response.data.userId,
+                conversationId: response.data.conversationId,
+                tenantId: response.data.tenantId,
+                preference: response.data.preference,
+                userType: response.data.userType,
             });
-            //console.log("res: " + JSON.stringify(response));//.preference))response.data[0]
-            console.log("res: " + JSON.stringify(response.data[0]));
         } catch (error) {
             return error;
         }

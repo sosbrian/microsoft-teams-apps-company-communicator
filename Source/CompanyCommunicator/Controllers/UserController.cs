@@ -40,27 +40,27 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// </summary>
         /// <returns>A list of team data.</returns>
         [HttpGet("{id}")]
-        public async Task<IEnumerable<UserDataEntity>> GetAllUsersDataAsync(IEnumerable<string> id) {
+        public async Task<UserDataEntity> GetAllUsersDataAsync(string id) {
             var entities = await this.userDataRepository.GetUserDataEntitiesByIdsAsync(id);
             var result = new List<UserDataEntity>();
-            foreach (var entity in entities)
-            {
+            //foreach (var entity in entities)
+            //{
                 var user = new UserDataEntity
                 {
-                    PartitionKey = entity.PartitionKey,
-                    RowKey = entity.RowKey,
-                    AadId = entity.AadId,
-                    UserId = entity.UserId,
-                    ConversationId = entity.ConversationId,
-                    ServiceUrl = entity.ServiceUrl,
-                    TenantId = entity.TenantId,
-                    Preference = entity.Preference,
-                    UserType = entity.UserType,
+                    PartitionKey = entities.PartitionKey,
+                    RowKey = entities.RowKey,
+                    AadId = entities.AadId,
+                    UserId = entities.UserId,
+                    ConversationId = entities.ConversationId,
+                    ServiceUrl = entities.ServiceUrl,
+                    TenantId = entities.TenantId,
+                    Preference = entities.Preference,
+                    UserType = entities.UserType,
                 };
-                result.Add(user);
-            }
+                //result.Add(user);
+            //}
 
-            return result;
+            return user;
         }
 
         // [HttpPost("update")]

@@ -105,11 +105,17 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData
         }
 
         /// <inheritdoc/>
-        public async Task<IEnumerable<UserDataEntity>> GetUserDataEntitiesByIdsAsync(IEnumerable<string> userIds)
+        public async Task<UserDataEntity> GetUserDataEntitiesByIdsAsync(string userId)
         {
-            var rowKeysFilter = this.GetRowKeysFilter(userIds);
+            //var rowKeysFilter = this.GetRowKeysFilter(userIds);
 
-            return await this.GetWithFilterAsync(rowKeysFilter);
+            //return await this.GetWithFilterAsync(rowKeysFilter);
+            //var userDataEntity = await this.GetAsync(
+            //    UserDataTableNames.UserDataPartition,
+            //    userId);
+            return await this.GetAsync(
+                UserDataTableNames.UserDataPartition,
+                userId);
         }
     }
 }

@@ -38,12 +38,12 @@ namespace Microsoft.Teams.Apps.DIConnect.Controllers
         [HttpGet]
         public IActionResult GetAppSettings()
         {
-            var ConnectionString = this.botOptions.StorageAccountName;
-            var SasToken = this.botOptions.SasToken;
+            var connectionString = this.botOptions.StorageAccountName;
+            var sasToken = this.botOptions.SasToken;
             var response = new AppConfigurations()
             {
-                StorageAccountName = ConnectionString,
-                SasToken = SasToken,
+                StorageAccountName = connectionString,
+                SasToken = sasToken,
             };
 
             return this.Ok(response);

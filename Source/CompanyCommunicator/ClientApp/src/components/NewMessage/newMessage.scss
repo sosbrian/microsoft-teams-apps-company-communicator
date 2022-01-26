@@ -21,7 +21,7 @@
         width: 100% !important;
     }*/
 
-    .test Drop > ul {
+    .testDrop > ul {
         width: auto;
     }
 
@@ -39,6 +39,10 @@
 
     .testDrop > .an > .cx {
         padding-right: 0 !important;
+    }
+
+    .textArea > .mr {
+        resize: vertical !important;
     }
 
     .Templates {
@@ -120,6 +124,7 @@
                     //width: 100%;
                     border-radius: 0px;
                     display: block;
+
                     .ui-dropdown__container {
                         width: 100%;
                     }

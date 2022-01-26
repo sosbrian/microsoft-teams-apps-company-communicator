@@ -107,3 +107,8 @@ export const updateUserPreference = async (payload: {}): Promise<any> => {
     let url = baseAxiosUrl + "/user";
     return await axios.put(url, payload);
 }
+
+export const getAppSettings = async (): Promise<any> => {
+    let url = baseAxiosUrl + "/settings";
+    return await axios.get(url);
+}

@@ -12,7 +12,7 @@ import * as microsoftTeams from "@microsoft/teams-js";
 
 import './newMessage.scss';
 import './teamTheme.scss';
-import { getDraftNotification, getTeams, createDraftNotification, updateDraftNotification, searchGroups, getGroups, verifyGroupAccess, getUsers } from '../../apis/messageListApi';
+import { getDraftNotification, getTeams, createDraftNotification, updateDraftNotification, searchGroups, getGroups, verifyGroupAccess, getUsers, getAppSettings } from '../../apis/messageListApi';
 import {
     getInitAdaptiveCard, setCardTitle, setCardImageLink, setCardSummary,
     setCardAuthor, setCardBtn, setCardBtn2, setCardBtn3, setCardBtn4, setCardBtn5, setVideoBtn, setSenderTemplate, setBoldSummary, setFontSummary, setAlignmentSummary, setFontSizeSummary, setFontColorSummary, setReaction, SetReactionQuestion, SetFreeText, SetFreeTextQuestion, setYesNo, setYesNoQuestion, setSubmitBtn, setToggleLinktoSurvey, setLinktoSurvey
@@ -256,6 +256,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
     readonly localize: TFunction;
     private card: any;
     fileInput: any;
+    storageAccountName: string;
+    sasToken: string;
 
 
     constructor(props: INewMessageProps) {
@@ -462,6 +464,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
             }
             ;
         var TempDate = this.getRoundedDate(5, this.getDateObject()); //get the current date
+        this.storageAccountName = "";
+        this.sasToken = "";
         //this.setDefaultCard(this.card);
         this.state = {
             alignment: "left",
@@ -589,51 +593,59 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         document.addEventListener("keydown", this.escFunction, false);
         let params = this.props.match.params;
         this.setGroupAccess();
-        this.getTeamList().then(() => {
-            if ('id' in params) {
-                let id = params['id'];
-                this.getItem(id).then(() => {
-                    const selectedTeams = this.makeDropdownItemList(this.state.selectedTeams, this.state.teams);
-                    const selectedRosters = this.makeDropdownItemList(this.state.selectedRosters, this.state.teams);
+        this.getAppSettings().then(() => {
+            this.getTeamList().then(() => {
+                if ('id' in params) {
+                    let id = params['id'];
+                    this.getItem(id).then(() => {
+                        const selectedTeams = this.makeDropdownItemList(this.state.selectedTeams, this.state.teams);
+                        const selectedRosters = this.makeDropdownItemList(this.state.selectedRosters, this.state.teams);
+                        this.setState({
+                            exists: true,
+                            messageId: id,
+                            selectedTeams: selectedTeams,
+                            selectedRosters: selectedRosters,
+                            selectedSchedule: this.state.selectedSchedule,
+                            scheduledDate: this.state.scheduledDate,
+                            DMY: this.getDateObject(this.state.scheduledDate),
+                            DMYHour: this.getDateHour(this.state.scheduledDate),
+                            DMYMins: this.getDateMins(this.state.scheduledDate),
+                            isExpirySet: this.state.isExpirySet,
+                            expiryDate: this.state.expiryDate,
+                            expiryDMY: this.getDateObject(this.state.expiryDate),
+                            expiryDMYHour: this.getDateHour(this.state.expiryDate),
+                            expiryDMYMins: this.getDateMins(this.state.expiryDate),
+                        })
+                    });
+                    this.getGroupData(id).then(() => {
+                        const selectedGroups = this.makeDropdownItems(this.state.groups);
+                        this.setState({
+                            selectedGroups: selectedGroups
+                        })
+                    });
+                } else {
                     this.setState({
-                        exists: true,
-                        messageId: id,
-                        selectedTeams: selectedTeams,
-                        selectedRosters: selectedRosters,
-                        selectedSchedule: this.state.selectedSchedule,
-                        scheduledDate: this.state.scheduledDate,
-                        DMY: this.getDateObject(this.state.scheduledDate),
-                        DMYHour: this.getDateHour(this.state.scheduledDate),
-                        DMYMins: this.getDateMins(this.state.scheduledDate),
-                        isExpirySet: this.state.isExpirySet,
-                        expiryDate: this.state.expiryDate,
-                        expiryDMY: this.getDateObject(this.state.expiryDate),
-                        expiryDMYHour: this.getDateHour(this.state.expiryDate),
-                        expiryDMYMins: this.getDateMins(this.state.expiryDate),
+                        exists: false,
+                        loader: false
+                    }, () => {
+                        let adaptiveCard = new AdaptiveCards.AdaptiveCard();
+                        adaptiveCard.parse(this.state.card);
+                        let renderedCard = adaptiveCard.render();
+                        document.getElementsByClassName('adaptiveCardContainer')[0].appendChild(renderedCard);
+                        if (this.state.btnLink) {
+                            let link = this.state.btnLink;
+                            adaptiveCard.onExecuteAction = function (action) { window.open(link, '_blank'); };
+                        }
                     })
-                });
-                this.getGroupData(id).then(() => {
-                    const selectedGroups = this.makeDropdownItems(this.state.groups);
-                    this.setState({
-                        selectedGroups: selectedGroups
-                    })
-                });
-            } else {
-                this.setState({
-                    exists: false,
-                    loader: false
-                }, () => {
-                    let adaptiveCard = new AdaptiveCards.AdaptiveCard();
-                    adaptiveCard.parse(this.state.card);
-                    let renderedCard = adaptiveCard.render();
-                    document.getElementsByClassName('adaptiveCardContainer')[0].appendChild(renderedCard);
-                    if (this.state.btnLink) {
-                        let link = this.state.btnLink;
-                        adaptiveCard.onExecuteAction = function (action) { window.open(link, '_blank'); };
-                    }
-                })
-            }
+                }
+            });
         });
+    }
+
+    private getAppSettings = async () => {
+        let response = await getAppSettings();
+        this.storageAccountName = response.data.storageAccountName;
+        this.sasToken = response.data.sasToken;
     }
 
     //function to handle the secondary language layout
@@ -1461,8 +1473,8 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         this.setState({
             uploadStatus: "Upload..."
         });
-        let storageAccountName = "45u3yv4vigkqc";
-        let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-24T15:09:09Z&st=2022-01-24T07:09:09Z&spr=https&sig=j2simiX4QfXRhRFC867wxgkiMhcCOcEfKM4j4XjzoY8%3D";
+        //let storageAccountName = "45u3yv4vigkqc";
+        //let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-24T15:09:09Z&st=2022-01-24T07:09:09Z&spr=https&sig=j2simiX4QfXRhRFC867wxgkiMhcCOcEfKM4j4XjzoY8%3D";
         //let storageAccountName = "qabra5qtfyb2w";
         //let sasToken = "sv=2020-08-04&ss=b&srt=sco&sp=rwlacix&se=2023-01-19T19:24:27Z&st=2022-01-19T11:24:27Z&spr=https&sig=NRfFQM%2F4wF9EKGpjWYCwwee%2FgUKhxnDq0qMHptaFtBU%3D";
 
@@ -1480,7 +1492,7 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         });
     
         const blobService = new BlobServiceClient(
-            `https://${storageAccountName}.blob.core.windows.net/?${sasToken}`
+            `https://${this.storageAccountName}.blob.core.windows.net/?${this.sasToken}`
         );
     
         const containerClient = blobService.getContainerClient('files');
@@ -1497,7 +1509,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
         let blobUrl = blobClient.url;
         //setVideoBtn(this.card, blobUrl);
         //this.updateCard();
-        console.log(blobUrl);
         if (this.state.language === "Primary"){
             this.setState({
                 videoLink: blobUrl,
@@ -2609,11 +2620,6 @@ class NewMessage extends React.Component<INewMessageProps, formState> {
                                                         error={!(this.state.errorVideoUrlMessage === "")}
                                                         autoComplete="off"
                                                     />
-                                                        {/*<Input onChange={this.onVideoUpload}*/}
-                                                        {/*    type="file"*/}
-                                                        {/*    accept="video/mp4"*/}
-                                                        {/*/>*/}
-                                                    {/*</Flex>*/}
                                                     <Flex gap="gap.smaller" vAlign="center" className="inputField">
                                                         <input onChange={this.onVideoUpload}
                                                             style={{ background: 'none', width: '100%' }}

@@ -39,5 +39,15 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot
         /// Gets or sets the App Service Uri for Task Module.
         /// </summary>
         public string AppServiceUri { get; set; }
+
+        /// <summary>
+        /// Gets or sets the StorageAccountName.
+        /// </summary>
+        public string StorageAccountName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the StorageAccountName.
+        /// </summary>
+        public string SasToken { get; set; }
     }
 }

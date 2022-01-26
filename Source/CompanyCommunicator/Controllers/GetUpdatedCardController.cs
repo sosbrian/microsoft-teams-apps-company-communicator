@@ -18,6 +18,8 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard;
+
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.CommonBot;
     using Microsoft.Bot.Builder;
     using Microsoft.Bot.Builder.Integration.AspNet.Core;
@@ -32,9 +34,10 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         private readonly INotificationDataRepository notificationDataRepository;
         private readonly ISentNotificationDataRepository sentNotificationDataRepository;
         private readonly AdaptiveCardCreator adaptiveCardCreator;
-        private readonly BotFrameworkHttpAdapter adapter;
-        private readonly IBot authorBot;
-        private readonly IBot userBot;
+        private readonly IUserDataRepository userDataRepository;
+        //private readonly BotFrameworkHttpAdapter adapter;
+        //private readonly IBot authorBot;
+        //private readonly IBot userBot;
         //private readonly string taskModuleAppId;
 
         /// <summary>
@@ -45,22 +48,24 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
         /// <param name="notificationRepo">Sent notification data repository instance. Whatvever la. Who cares param. WFC.</param>
         /// <param name="botOptions">The bot options.</param>
         public GetUpdatedCardController(
+            IUserDataRepository userDataRepository,
             INotificationDataRepository notificationDataRepository,
             ISendingNotificationDataRepository notificationRepo,
             AdaptiveCardCreator adaptiveCardCreator,
-            ISentNotificationDataRepository sentNotificationDataRepository,
-            CompanyCommunicatorBotAdapter adapter,
-            AuthorTeamsActivityHandler authorBot,
-            UserTeamsActivityHandler userBot)
+            ISentNotificationDataRepository sentNotificationDataRepository)
+            //CompanyCommunicatorBotAdapter adapter,
+            //AuthorTeamsActivityHandler authorBot,
+            //UserTeamsActivityHandler userBot)
             //IOptions<BotOptions> botOptions)
         {
+            this.userDataRepository = userDataRepository ?? throw new ArgumentNullException(nameof(userDataRepository));
             this.notificationRepo = notificationRepo ?? throw new ArgumentNullException(nameof(notificationRepo));
             this.adaptiveCardCreator = adaptiveCardCreator ?? throw new ArgumentException(nameof(adaptiveCardCreator));
             this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository)); //Get Card
             this.sentNotificationDataRepository = sentNotificationDataRepository ?? throw new ArgumentException(nameof(sentNotificationDataRepository));
-            this.adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
-            this.authorBot = authorBot ?? throw new ArgumentNullException(nameof(authorBot));
-            this.userBot = userBot ?? throw new ArgumentNullException(nameof(userBot));
+            //this.adapter = adapter ?? throw new ArgumentNullException(nameof(adapter));
+            //this.authorBot = authorBot ?? throw new ArgumentNullException(nameof(authorBot));
+            //this.userBot = userBot ?? throw new ArgumentNullException(nameof(userBot));
             //var options = botOptions ?? throw new ArgumentNullException(nameof(botOptions));
             //this.taskModuleAppId = options.Value.TaskModuleAppID;
         }
@@ -83,6 +88,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 NotificationDataTableNames.SentNotificationsPartition,
                 notificationId);
             var vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, false, true);
+            var userData = await this.userDataRepository.GetUserDataEntitiesByIdsAsync(aadid);
 
             if ((textNotification.SurReaction == true && notification.ReactionResult == string.Empty)
                 || (textNotification.SurFreeText == true && notification.FreeTextResult == string.Empty)
@@ -95,7 +101,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Controllers
                 || (textNotification.SurFreeText == true && notification.FreeTextResult != string.Empty)
                 || (textNotification.SurYesNo == true && notification.YesNoResult != string.Empty))
             {
-                vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true, true);
+                if (userData.Preference == textNotification.SecLanguage)
+                {
+                    vCard = this.adaptiveCardCreator.CreateSecAdaptiveCard(textNotification, true, true);
+                } else
+                {
+                    vCard = this.adaptiveCardCreator.CreateAdaptiveCard(textNotification, true, true);
+                }
             }
 
             var test = vCard.ToJson()

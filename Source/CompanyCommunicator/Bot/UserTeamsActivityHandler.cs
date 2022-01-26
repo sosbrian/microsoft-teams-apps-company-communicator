@@ -20,7 +20,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.NotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.SentNotificationData;
     using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard;
-    //using Microsoft.Teams.Apps.CompanyCommunicator.Common.Services.AdaptiveCard.TaskModule;
+    using Microsoft.Teams.Apps.CompanyCommunicator.Common.Repositories.UserData;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -31,7 +31,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
     public class UserTeamsActivityHandler : TeamsActivityHandler
     {
         private static readonly string TeamRenamedEventType = "teamRenamed";
-        //private readonly IBotTelemetryClient botTelemetryClient;
+        private readonly IUserDataRepository userDataRepository;
         private readonly INotificationDataRepository notificationDataRepository;
         private readonly ISentNotificationDataRepository sentNotificationDataRepository;
         private readonly AdaptiveCardCreator adaptiveCardCreator;
@@ -43,13 +43,13 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
         /// </summary>
         /// <param name="teamsDataCapture">Teams data capture service.</param>
         public UserTeamsActivityHandler(TeamsDataCapture teamsDataCapture,
-            //IBotTelemetryClient botTelemetryClient,
+            IUserDataRepository userDataRepository,
             AdaptiveCardCreator adaptiveCardCreator,
             INotificationDataRepository notificationDataRepository,
             ISentNotificationDataRepository sentNotificationDataRepository)
         {
             this.teamsDataCapture = teamsDataCapture ?? throw new ArgumentNullException(nameof(teamsDataCapture));
-            //this.botTelemetryClient = botTelemetryClient ?? throw new ArgumentNullException(nameof(botTelemetryClient));
+            this.userDataRepository = userDataRepository ?? throw new ArgumentNullException(nameof(userDataRepository));
             this.adaptiveCardCreator = adaptiveCardCreator ?? throw new ArgumentException(nameof(adaptiveCardCreator));
             this.notificationDataRepository = notificationDataRepository ?? throw new ArgumentException(nameof(notificationDataRepository));
             this.sentNotificationDataRepository = sentNotificationDataRepository ?? throw new ArgumentException(nameof(sentNotificationDataRepository));
@@ -92,32 +92,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
             }
         }
 
-        protected virtual async Task<InvokeResponse> OnTeamsCardActionInvokeAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellation)
-        {
-            if (!string.IsNullOrEmpty(turnContext.Activity.ReplyToId))
-            {
-                var txt = turnContext.Activity.Text;
-                dynamic value = turnContext.Activity.Value;
-                if (string.IsNullOrEmpty(txt) && value != null)
-                {
-                    string notificationId = value["notificationId"];
-                    string reactionResult = value["Reaction"];
-                    string freeTextResult = value["FreeTextSurvey"];
-                    string yesNoResult = value["YesNo"];
-
-                    var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
-
-                    if ((notificationEntity.SurReaction == true && reactionResult == null)
-                        || (notificationEntity.SurFreeText == true && freeTextResult == null)
-                        || (notificationEntity.SurYesNo == true && yesNoResult == null))
-                    {
-                        throw new InvokeResponseException(HttpStatusCode.NotImplemented);
-                    }
-                }
-            }
-            throw new InvokeResponseException(HttpStatusCode.NotImplemented);
-        }
-
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrEmpty(turnContext.Activity.ReplyToId))
@@ -132,6 +106,9 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
                     string reactionResult = value["Reaction"];
                     string freeTextResult = value["FreeTextSurvey"];
                     string yesNoResult = value["YesNo"];
+                    string AadId = turnContext.Activity.From?.AadObjectId;
+                    var userData = await this.userDataRepository.GetUserDataEntitiesByIdsAsync(AadId);
+                    AdaptiveCard card;
 
                     var notificationEntity = await this.notificationDataRepository.GetAsync(NotificationDataTableNames.SentNotificationsPartition, notificationId);
 
@@ -142,7 +119,14 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Bot
                         return;
                     }
 
-                    var card = this.adaptiveCardCreator.CreateAdaptiveCard(notificationEntity, true);
+                    if ( userData.Preference.Equals(notificationEntity.SecLanguage))
+                    {
+                        card = this.adaptiveCardCreator.CreateSecAdaptiveCard(notificationEntity, true);
+                    } else
+                    {
+                        card = this.adaptiveCardCreator.CreateAdaptiveCard(notificationEntity, true);
+                    }
+
                     var updatedCard = card.ToJson().Replace("\\n", "\\n\\r");
 
                     var adaptiveCardAttachment = new Attachment()

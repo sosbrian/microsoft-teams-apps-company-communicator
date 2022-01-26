@@ -217,47 +217,14 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 var notificationId = messageContent.NotificationId;
                 var notificationEntity = await this.notificationDataRepository.GetAsync(
                     NotificationDataTableNames.SentNotificationsPartition,
-                    notificationId); // Testing Check Email Option
-
-                var sendMail2User1 = await graphServiceClient.Users[this.emailSenderAadId]
-                .Request()
-                .Select("userPrincipalName")
-                .GetAsync();
-                var message1 = new Message
-                {
-                    Subject = "Debug Email",
-                    Body = new ItemBody
-                    {
-                        ContentType = BodyType.Html,
-                        Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" +
-                            "</script></head><body>" +
-                            JsonConvert.SerializeObject(messageContent) +
-                            "<br>" +
-                            notificationEntity.SecLanguage + "<br></body></html>",
-                    },
-                    ToRecipients = new List<Recipient>()
-                    {
-                        new Recipient
-                        {
-                            EmailAddress = new EmailAddress
-                            {
-                                Address = sendMail2User1.UserPrincipalName,
-                            },
-                        },
-                    },
-                };
-
-                await graphServiceClient.Users[this.emailSenderAadId]
-                        .SendMail(message1, false)
-                        .Request()
-                        .PostAsync();
-                // return;
+                    notificationId); // Check Email Option
 
                 // Send message.
+                SendMessageResponse response;
                 if (!string.IsNullOrWhiteSpace(notificationEntity.SecLanguage) && messageContent.RecipientData.UserData.Preference == notificationEntity.SecLanguage)
                 {
                     var messageActivity = await this.GetSecMessageActivity(messageContent);
-                    var response = await this.messageService.SendMessageAsync(
+                    response = await this.messageService.SendMessageAsync(
                     message: messageActivity,
                     serviceUrl: messageContent.GetServiceUrl(),
                     conversationId: messageContent.GetConversationId(),
@@ -265,12 +232,12 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     logger: log);
 
                     // Process response.
-                    await this.ProcessResponseAsync(messageContent, response, log);
+                    //await this.ProcessResponseAsync(messageContent, response, log);
                 }
                 else
                 {
                     var messageActivity = await this.GetMessageActivity(messageContent);
-                    var response = await this.messageService.SendMessageAsync(
+                    response = await this.messageService.SendMessageAsync(
                     message: messageActivity,
                     serviceUrl: messageContent.GetServiceUrl(),
                     conversationId: messageContent.GetConversationId(),
@@ -278,19 +245,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                     logger: log);
 
                     // Process response.
-                    await this.ProcessResponseAsync(messageContent, response, log);
+                    //await this.ProcessResponseAsync(messageContent, response, log);
                 }
 
-                //var messageActivity = await this.GetMessageActivity(messageContent);
-                //var response = await this.messageService.SendMessageAsync(
-                //    message: messageActivity,
-                //    serviceUrl: messageContent.GetServiceUrl(),
-                //    conversationId: messageContent.GetConversationId(),
-                //    maxAttempts: this.maxNumberOfAttempts,
-                //    logger: log);
-
                 // Process response.
-                //await this.ProcessResponseAsync(messageContent, response, log);
+                await this.ProcessResponseAsync(messageContent, response, log);
 
                 // Send Adaptive Card to Email.
                 var recData = messageContent.RecipientData.RecipientId;
@@ -321,7 +280,6 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                         {
                             ContentType = BodyType.Html,
                             Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + json + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br></body></html>",
-                            //Content = "<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8'><script type='application/adaptivecard+json'>" + tJson + "</script></head><body>If you are not able to see this mail, click <a href='https://outlook.office.com/mail/inbox'>here</a> to check in Outlook Web Client.<br>" + JsonConvert.SerializeObject(tJson, Formatting.Indented) + "</body></html>",
                         },
                         ToRecipients = new List<Recipient>()
                         {
@@ -434,29 +392,11 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
             var parsedResult = AdaptiveCard.FromJson(notification.Content);
             var card = parsedResult.Card;
 
-            //var recipentAadid = message.RecipientData.RecipientId;
-            //var trackImageUrl = $"{this.appServiceUri}/api/GetUpdatedCard/Result?notificationId={message.NotificationId}&aadid={recipentAadid}.gif";
-
-            //var pixel = new AdaptiveImage()
-            //{
-            //    Url = new Uri(trackImageUrl, UriKind.RelativeOrAbsolute),
-            //    Spacing = AdaptiveSpacing.None,
-            //    AltText = string.Empty,
-            //};
-            //pixel.AdditionalProperties.Add("width", "1px");
-            //pixel.AdditionalProperties.Add("height", "1px");
-            //card.Body.Add(pixel);
             this.teamsCard = card;
             this.aCard = card;
             notification.Content = notification.Content
                 .Replace("\\n", "\\n\\r");
-            //.Replace($"\"data\":{{\"notificationId\":{message.NotificationId}}}", "\"data\":{\"msteams\":{\"type\":\"task/fetch\"},\"data\":\"Invoke\"}");
-            //var cardJson = new AdaptiveTextBlock()
-            //{
-            //    Text = notification.Content,
-            //    Wrap = true,
-            //};
-            //card.Body.Add(cardJson);
+
             var adaptiveCardAttachment = new Attachment()
             {
                 ContentType = AdaptiveCardContentType,
@@ -473,7 +413,7 @@ namespace Microsoft.Teams.Apps.CompanyCommunicator.Send.Func
                 NotificationDataTableNames.SendingNotificationsPartition,
                 message.NotificationId);
 
-            var parsedResult = AdaptiveCard.FromJson(notification.Content);
+            var parsedResult = AdaptiveCard.FromJson(notification.Content2);
             var card = parsedResult.Card;
 
             this.teamsCard = card;
